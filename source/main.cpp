@@ -3,18 +3,22 @@
  *  @author Selan R. dos Santos
  */
 
-#include "simulation.h"
-using namespace sg;
+#include "player.cpp"
+#include "level.cpp"
+#include "reader.cpp"
+#include "snake.cpp"
+//using namespace sg;// <------------------------ NÃO ENTENDI PQ EU USARIA NAMESPACE
 
 int main(int argc, char* argv[]) {
   // SnazeSimulation is a singleton.
-  SnazeSimulation::initialize(argc, argv);
+  SnazeSimulation &sg = SnazeSimulation::get_instance(); //Initalize Singleton sg (snakegame)
+  sg.initialize(argc, argv);
+
   // The Game Loop.
-  while (not SnazeSimulation::is_over()) {
-    SnazeSimulation::process_events();
-    SnazeSimulation::update();
-    SnazeSimulation::render();
+  while (not sg.is_over()) {
+    sg.process_events();
+    sg.update();
+    sg.render();
   }
   return 0;
 }
-
