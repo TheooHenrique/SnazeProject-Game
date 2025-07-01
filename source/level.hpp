@@ -1,20 +1,30 @@
 #ifndef LEVEL
 #define LEVEL
 #include <cstddef>
-#include "simulation.cpp"
+#include "positiondirection.hpp"
+#include "snake.hpp"
 
 class Level{
     private:
+    
     size_t m_width;
     size_t m_length;
+    size_t food_amount;
     Position m_spawnpoint;
     Position m_food_coords;
+    Snake &sn = Snake::get_instance();
+    
 
     public:
+    Level(){
+
+    }
     void set_width(size_t);
     void set_length(size_t);
-    size_t get_spawnpoint();
+    void set_food_amount(size_t);
+    Position get_spawnpoint();
     Position generate_food();
+    Snake get_snake();
 };
 
 

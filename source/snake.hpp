@@ -1,6 +1,6 @@
 #ifndef SNAKE
 #define SNAKE
-#include "simulation.hpp"
+#include "positiondirection.hpp"
 #include <cstddef>
 #include <vector>
 class Snake{

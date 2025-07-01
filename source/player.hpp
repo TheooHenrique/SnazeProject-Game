@@ -1,6 +1,6 @@
 #ifndef PLAYER
 #define PLAYER
-#include "simulation.hpp"
+#include "positiondirection.hpp"
 #include <string>
 #include <vector>
 
