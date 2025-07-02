@@ -2,7 +2,6 @@
 #define LEVEL
 #include <cstddef>
 #include "positiondirection.hpp"
-#include "snake.hpp"
 
 class Level{
     private:
@@ -12,7 +11,6 @@ class Level{
     size_t food_amount;
     Position m_spawnpoint;
     Position m_food_coords;
-    Snake &sn = Snake::get_instance();
     
 
     public:
@@ -24,7 +22,6 @@ class Level{
     void set_food_amount(size_t);
     Position get_spawnpoint();
     Position generate_food();
-    Snake get_snake();
 };
 
 

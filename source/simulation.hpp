@@ -31,9 +31,14 @@ class SnazeSimulation{
     size_t m_current_state;
     size_t m_fps;
     Level lvl;
-    PlayerType pl;
+    PlayerRandom RPlayer;
+    PlayerBacktrack BPlayer;
+    Player* my_player;
+
 
     public:
+    
+    void usage();
     void initialize(int, char*[]);
     bool is_over();
     void process_events();
