@@ -2,10 +2,13 @@
 #define SIMULATION
 
 
-#include "level.cpp"
-#include "player.cpp"
+#include "level.hpp"
+#include "player.hpp"
+#include "reader.hpp"
 #include <cstddef>
 #include <cstdint>
+#include <fstream>
+#include <vector>
 
 class SnazeSimulation{
 
@@ -32,6 +35,8 @@ class SnazeSimulation{
     size_t m_fps;
     Level lvl;
     Player* my_player;
+    std::vector<Level> levels;
+    Reader read;
 
 
     public:

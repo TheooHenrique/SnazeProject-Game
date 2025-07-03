@@ -3,7 +3,7 @@
  *  @author Selan R. dos Santos
  */
 
-#include "simulation.cpp"
+#include "simulation.hpp"
 
 int main(int argc, char* argv[]) {
   // SnazeSimulation is a singleton.
