@@ -6,8 +6,8 @@
 #include "player.cpp"
 #include "level.cpp"
 #include "reader.cpp"
+#include "simulation.hpp"
 #include "snake.cpp"
-//using namespace sg;// <------------------------ NÃO ENTENDI PQ EU USARIA NAMESPACE
 
 int main(int argc, char* argv[]) {
   // SnazeSimulation is a singleton.

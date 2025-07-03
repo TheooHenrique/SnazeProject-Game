@@ -1,9 +1,11 @@
 #ifndef SIMULATION
 #define SIMULATION
 
+
+#include "level.hpp"
+#include "player.hpp"
 #include <cstddef>
 #include <cstdint>
-#include <string>
 
 class SnazeSimulation{
 
@@ -11,14 +13,32 @@ class SnazeSimulation{
     SnazeSimulation(){
         m_current_state = START;
     }
-
     enum m_possible_states : uint8_t{
         START,
+        READING_INPUT,
+        INVALID_INPUT,
+        WAITING_START,
+        BACKTRACK_SEARCH,
+        RANDOM_SEARCH,
+        WALKING,
+        FOUND,
+        DEAD,
+        WON_ROUND,
+        WON_GAME,
+        LOST,
+        END
     };
     size_t m_current_state;
     size_t m_fps;
+    Level lvl;
+    PlayerRandom RPlayer;
+    PlayerBacktrack BPlayer;
+    Player* my_player;
+
 
     public:
+    
+    void usage();
     void initialize(int, char*[]);
     bool is_over();
     void process_events();
@@ -31,28 +51,6 @@ class SnazeSimulation{
     }
 
 };
-class Position{
-    private:
-    size_t m_x;
-    size_t m_y;
-
-    public:
-    size_t get_x();
-    size_t get_y();
-    void set_y(size_t);
-    void set_x(size_t);
-};
-
-class Direction{
-    private:
-    std::string m_current_dir;
-
-    public:
-    void set_dir(std::string);
-    std::string get_dir();
-};
-
-
     
 
 #endif

@@ -1,32 +1,46 @@
 #ifndef PLAYER
 #define PLAYER
-#include "simulation.hpp"
-#include <string>
+#include "positiondirection.hpp"
+#include "snake.hpp"
 #include <vector>
 
-class PlayerType{
+class Player{
     private:
-    std::string m_player_type;
+    Snake &sn = Snake::get_instance();
 
     public:
-    std::string get_type();
-    void set_type(std::string);
+    Snake get_snake();
+    virtual ~Player() = default;
+    virtual Direction next_move();
 };
 
-class PlayerRandom{
+
+
+class PlayerRandom : public Player{
     private:
 
     public:
-    Direction next_move();
+    //Constructor Random
+    PlayerRandom(){
+
+    }
+    Direction next_move() override;
 };
 
-class PlayerBacktrack{
+
+
+class PlayerBacktrack : public Player{
     private:
 
+
     public:
-    std::vector<Direction> find_smart_solution();
+    //Constructor Backtrack
+    PlayerBacktrack(){
+
+    }
+    std::vector<Direction> find_solution();
     bool found_solution();
-    Direction next_move();
+    Direction next_move() override;
 };
 
 

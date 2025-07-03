@@ -1,6 +1,6 @@
 #ifndef SNAKE
 #define SNAKE
-#include "simulation.hpp"
+#include "positiondirection.hpp"
 #include <cstddef>
 #include <vector>
 class Snake{
@@ -14,19 +14,22 @@ class Snake{
     //Constructor:
     Snake(){
         m_current_size = 1;
+        m_current_score = 0;
+        m_eaten_food = 0;
+        
     }
-
+    
     public:
     static Snake& get_instance(){
         static Snake sn;
         return sn;
     }
-    size_t get_dir();
+    Direction get_dir();
     size_t get_size();
     size_t get_eated();
     size_t get_lives();
     size_t get_score();
-    size_t get_body();
+    std::vector<Position> get_body();
     void set_dir(Direction);
     void set_size(size_t);
     void set_eated(size_t);
