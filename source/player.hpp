@@ -14,8 +14,6 @@ class Player{
     virtual Direction next_move();
 };
 
-
-
 class PlayerRandom : public Player{
     private:
 

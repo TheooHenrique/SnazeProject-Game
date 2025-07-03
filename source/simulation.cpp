@@ -1,12 +1,11 @@
-#include "dictionarys.hpp"
 #include <cctype>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include "dictionarys.cpp"
 #include "simulation.hpp"
-#include "level.hpp"
-#include "player.hpp"
+
 //====================Simulation Func========================
 
 void SnazeSimulation::usage(){
@@ -17,7 +16,6 @@ void SnazeSimulation::usage(){
     std::cout << "--lives <num> Number of lives the snake shall have. Default = 5.\n";
     std::cout << "--food <num> Number of food pellets for the entire simulation. Default = 10.\n";
     std::cout << "--playertype <type> Type of snake intelligence: random, backtracking. Default = backtracking\n";
-
 }
 
 void SnazeSimulation::initialize(int argc, char* argv[]){
@@ -55,14 +53,14 @@ bool SnazeSimulation::is_over(){
 }
 
 void process_events(){
-
+    
 }
 
 void update(){
-
+    
 }
 
 void render(){
-
+    
 }
 

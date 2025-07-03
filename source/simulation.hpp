@@ -2,8 +2,8 @@
 #define SIMULATION
 
 
-#include "level.hpp"
-#include "player.hpp"
+#include "level.cpp"
+#include "player.cpp"
 #include <cstddef>
 #include <cstdint>
 
@@ -31,8 +31,6 @@ class SnazeSimulation{
     size_t m_current_state;
     size_t m_fps;
     Level lvl;
-    PlayerRandom RPlayer;
-    PlayerBacktrack BPlayer;
     Player* my_player;
 
 

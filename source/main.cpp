@@ -3,11 +3,7 @@
  *  @author Selan R. dos Santos
  */
 
-#include "player.cpp"
-#include "level.cpp"
-#include "reader.cpp"
-#include "simulation.hpp"
-#include "snake.cpp"
+#include "simulation.cpp"
 
 int main(int argc, char* argv[]) {
   // SnazeSimulation is a singleton.

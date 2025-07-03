@@ -11,7 +11,6 @@ class Level{
     size_t food_amount;
     Position m_spawnpoint;
     Position m_food_coords;
-    
 
     public:
     Level(){
@@ -23,7 +22,5 @@ class Level{
     Position get_spawnpoint();
     Position generate_food();
 };
-
-
 
 #endif

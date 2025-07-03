@@ -10,8 +10,6 @@ Direction PlayerRandom::next_move(){
     return lalala;
 }
 
-
-
 //==============PlayerBacktrack funct================
 std::vector<Direction> PlayerBacktrack::find_solution(){
     std::vector<Direction> lalala;
