@@ -30,7 +30,6 @@ class PlayerRandom : public Player{
 class PlayerBacktrack : public Player{
     private:
 
-
     public:
     //Constructor Backtrack
     PlayerBacktrack(){

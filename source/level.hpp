@@ -2,6 +2,7 @@
 #define LEVEL
 #include <cstddef>
 #include <string>
+#include <vector>
 #include "positiondirection.hpp"
 
 class Level{
@@ -9,10 +10,13 @@ class Level{
     
     size_t m_width;
     size_t m_length;
+    std::vector<std::string> m_level_maze;
+    
     size_t food_amount;
     Position m_spawnpoint;
     Position m_food_coords;
-    std::string m_level_maze;
+    
+    
 
     public:
     Level(){
@@ -22,11 +26,14 @@ class Level{
         this->m_length = y;
         this->m_width = x;
         this->m_spawnpoint = spawn;
-        this->m_level_maze = maze;
     }
     void set_width(size_t);
     void set_length(size_t);
+    void set_maze(std::vector<std::string>);
     void set_food_amount(size_t);
+
+    void print_level(Level);
+    std::vector<std::string>& get_maze();
     Position get_spawnpoint();
     Position generate_food();
 };
