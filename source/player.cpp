@@ -3,6 +3,10 @@
 #include <vector>
 //==============Player funct================
 Snake Player::get_snake(){return this->sn;}
+Direction Player::next_move(){
+    Direction lalala;
+    return lalala;
+};
 
 //==============PlayerRandom funct================
 Direction PlayerRandom::next_move(){

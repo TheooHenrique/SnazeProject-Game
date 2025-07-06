@@ -1,9 +1,11 @@
 #include <cctype>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include "dictionarys.cpp"
+#include "dictionarys.hpp"
 #include "simulation.hpp"
 
 //====================Simulation Func========================
@@ -20,15 +22,23 @@ void SnazeSimulation::usage(){
 
 void SnazeSimulation::initialize(int argc, char* argv[]){
     size_t aux = -1;
+    size_t count{0};
     for (size_t ct{1}; ct < argc ; ++ct){
+        //Capturing the level file.
+        std::string extension = std::filesystem::path(argv[ct]).extension().string();
+        if (extension == ".dat"){
+            if (count == 0){
+                read.parse_cfg(std::filesystem::path(argv[ct]));
+                count++;
+            } else{ std::cerr << "Error! You inputed two or more .dat files!\n"; break;}
+        }
+        
+        //Capturing the configurations
         auto it{items_with_their_keys.find(argv[ct])};
         if (it != items_with_their_keys.end()){
+            interface selected_option {it->second};
+            if (selected_option == HELP){usage(); exit(0);}
             if (ct + 1 < argc){
-                interface selected_option {it->second};
-                if (selected_option == HELP){
-                    usage();
-                    exit(0);
-                }
                 if (selected_option == FPS){try{set_fps(std::stoi(argv[ct + 1]));} catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at fps option!\n"; }}
                 if (selected_option == FOOD){try{lvl.set_food_amount(std::stoi(argv[ct + 1]));} catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at food option!\n";}}
                 if (selected_option == LIVES){try{aux = std::stoi(argv[ct + 1]);} catch(const std::runtime_error& e){std::cerr << "Error: You inserted a invalid type at lives option!\n";}}
@@ -43,7 +53,7 @@ void SnazeSimulation::initialize(int argc, char* argv[]){
                         }
                 } catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at player type option!\n";}}
             }
-            else {std::cerr << "Error: You don't inserted some of the config parameters!";}
+            else {std::cerr << "Error: You don't inserted some of the config parameters!\n";}
         }
     }
 }
@@ -52,15 +62,17 @@ bool SnazeSimulation::is_over(){
     return true; //temporary
 }
 
-void process_events(){
+void SnazeSimulation::process_events(){
     
 }
 
-void update(){
+void SnazeSimulation::update(){
     
 }
 
-void render(){
+void SnazeSimulation::render(){
     
 }
+
+void SnazeSimulation::set_fps(size_t value){ this->m_fps = value; }
 
