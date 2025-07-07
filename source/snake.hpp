@@ -1,5 +1,6 @@
 #ifndef SNAKE
 #define SNAKE
+#include "level.hpp"
 #include "positiondirection.hpp"
 #include <cstddef>
 #include <vector>
@@ -35,5 +36,6 @@ class Snake{
     void set_eated(size_t);
     void set_lives(size_t);
     void set_score(size_t);
+    void set_position(Level lv, char, Position);
 };
 #endif

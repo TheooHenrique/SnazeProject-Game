@@ -48,6 +48,8 @@ class SnazeSimulation{
     void update();
     void render();
     void set_fps(size_t);
+    
+    std::vector<Level> get_levels();
     void set_levels(std::vector<Level>);
     static SnazeSimulation& get_instance(){
         static SnazeSimulation sg;
