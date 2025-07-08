@@ -9,6 +9,12 @@ class Position{
     size_t m_y;
 
     public:
+    //constructor
+    Position() : m_x(0), m_y(0) {}
+
+    //constructor with x and y
+    Position(size_t x, size_t y) : m_x(x), m_y(y) {}
+    
     size_t get_x();
     size_t get_y();
     void set_y(size_t);

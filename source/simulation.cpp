@@ -67,7 +67,7 @@ void SnazeSimulation::initialize(int argc, char* argv[]){
 
 void SnazeSimulation::process_events(){
     if (m_current_state == RANDOM_SEARCH){
-        this->my_player->get_snake().set_position(m_current_lvl, 'c', );
+        //this->my_player->get_snake().set_position(m_current_lvl, 'c', );
     }
 }
 

@@ -16,7 +16,6 @@ class Level{
     Position m_spawnpoint;
     Position m_food_coords;
     
-    
 
     public:
     Level(){
@@ -34,6 +33,7 @@ class Level{
 
     char get_item_pos(std::vector<std::string>, size_t, size_t);
     void print_level(Level);
+    void place_food_in_maze(Position&);
     std::vector<std::string>& get_maze();
     Position get_spawnpoint();
     Position generate_food();
