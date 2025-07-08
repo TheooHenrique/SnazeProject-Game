@@ -47,7 +47,7 @@ void Level::place_food_in_maze(Position& m_food_cords_for_this_function) {
     size_t y = m_food_cords_for_this_function.get_y();
 
     if (y < m_level_maze.size() && x < m_level_maze[y].size()) {
-        m_level_maze[y][x] = 'f'; //f is for foooooooooooooooooooooooood
+        m_level_maze[y][x] = 'f'; //f is for food
     }
 }
 
