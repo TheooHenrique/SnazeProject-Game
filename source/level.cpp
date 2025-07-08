@@ -17,3 +17,6 @@ void Level::print_level(Level lvl){
         std::cout << lvl.get_maze()[j] << std::endl;
     }
 }
+char Level::get_item_pos(std::vector<std::string> layout, size_t x, size_t y){
+    return layout[y][x];
+}
