@@ -33,9 +33,9 @@ class SnazeSimulation{
     };
     size_t m_current_state;
     size_t m_fps;
-    Level lvl;
+    Level m_current_lvl;
     Player* my_player;
-    std::vector<Level> levels;
+    std::vector<Level> m_levels;
     Reader read;
 
 
@@ -48,6 +48,7 @@ class SnazeSimulation{
     void update();
     void render();
     void set_fps(size_t);
+    void set_levels(std::vector<Level>);
     static SnazeSimulation& get_instance(){
         static SnazeSimulation sg;
         return sg;

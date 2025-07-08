@@ -1,7 +1,9 @@
 #ifndef READER
 #define READER
+#include "level.hpp"
 #include <fstream>
 #include <string>
+#include <vector>
 class Reader{
     private:
     std::string m_filename;
@@ -9,8 +11,8 @@ class Reader{
     public:
     Reader(){} //Constructor
 
-    void trim(std::string);
-    void parse_cfg(std::ifstream);
+    void trim(std::string&);
+    std::vector<Level> parse_cfg(std::ifstream&);
 };
 
 
