@@ -21,6 +21,6 @@ void Snake::set_lives(size_t){
 void Snake::set_score(size_t){
     
 }
-void Snake::set_position(Level lvl, char c, Position pos){
+void Snake::set_position(Level &lvl, char c, Position pos){
     lvl.get_maze()[pos.get_y()][pos.get_x()] = c;
 }

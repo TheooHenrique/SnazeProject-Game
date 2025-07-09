@@ -41,19 +41,26 @@ class SnazeSimulation{
 
     public:
     
+    //Methods:
     void usage();
     void initialize(int, char*[]);
     bool is_over();
     void process_events();
     void update();
     void render();
-    void set_fps(size_t);
 
-    Player get_player();
-    Level get_current_level();
-    
-    std::vector<Level> get_levels();
+    //Setters
+    void set_fps(size_t);
     void set_levels(std::vector<Level>);
+
+    //Getters
+    Snake get_snake();
+    Player get_player();
+    Level& get_current_level ();
+    std::vector<Level> get_levels();
+
+    //Singleton Pattern Implementation
+    Snake &sn = Snake::get_instance();
     static SnazeSimulation& get_instance(){
         static SnazeSimulation sg;
         return sg;
