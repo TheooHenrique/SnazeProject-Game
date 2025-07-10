@@ -2,35 +2,48 @@
 #define posdic
 
 #include <cstddef>
-#include <string>
 class Position{
     private:
     size_t m_x;
     size_t m_y;
 
     public:
-    Position(){
-        
-    }
-  
-    Position(size_t x, size_t y){
-        m_x = x;
-        m_y = y;
-    }
+    Position(){ } //Default constructor
+    Position(size_t x, size_t y){ m_x = x; m_y = y; } //Receiving x and y constructor 
+    bool operator!=(const Position& other){ return (!(this->m_x == other.m_x && this->m_y == other.m_y)); } //Comparation (different) operator
+    bool operator==(const Position& other){ return (this->m_x == other.m_x && this->m_y == other.m_y); } //Comparation (equal) operator
 
-    size_t get_x();
-    size_t get_y();
+    //Setters
     void set_y(size_t);
     void set_x(size_t);
+
+    //Getters
+    size_t get_x();
+    size_t get_y();
 };
 
-class Direction{
-    private:
-    std::string m_current_dir;
+struct Direction{
+    public:
+
+    //constructor
+    Direction(){};
+    //Constructor with determined direction
+    Direction(size_t x){m_current_dir = x;};
+    size_t m_current_dir;
+    enum directions : size_t{
+        UP = 0,
+        DOWN,
+        LEFT,
+        RIGHT
+    };
 
     public:
-    void set_dir(std::string);
-    std::string get_dir();
+
+    //Setters
+    void set_dir(size_t);
+
+    //Getters
+    size_t get_dir();
 };
 
 #endif

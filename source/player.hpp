@@ -1,40 +1,43 @@
 #ifndef PLAYER
 #define PLAYER
 #include "positiondirection.hpp"
-#include "snake.hpp"
+#include "level.hpp"
+#include <deque>
 #include <vector>
 
 class Player{
     private:
-    
-
+    std::deque<Position> nextpositions;
     public:
-    Snake get_snake();
+    //Methods
     virtual ~Player() = default;
     virtual Direction next_move();
+    bool check_if_next_is_playable(Level, Position, Direction);
+    void change_direction(Direction&);
+
+    //Getters
+    std::deque<Position>& get_nextpositions();
+
+    //Setters
 };
 
 class PlayerRandom : public Player{
-    private:
-
     public:
-    //Constructor Random
-    PlayerRandom(){
+    //Random Constructor 
+    PlayerRandom(){ }
 
-    }
+    //Methods
     Direction next_move() override;
 };
 
 
 
 class PlayerBacktrack : public Player{
-    private:
-
     public:
-    //Constructor Backtrack
-    PlayerBacktrack(){
+    //Backtrack Constructor 
+    PlayerBacktrack(){ }
 
-    }
+    //Methods
     std::vector<Direction> find_solution();
     bool found_solution();
     Direction next_move() override;
