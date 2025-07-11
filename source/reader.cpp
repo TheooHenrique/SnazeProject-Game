@@ -2,6 +2,7 @@
 #include "level.hpp"
 #include <cctype>
 #include <cstddef>
+#include <deque>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -17,9 +18,9 @@ void Reader::trim(std::string &s){
     s.assign(start, end + 1);
 }
 
-std::vector<Level> Reader::parse_cfg(std::ifstream &file){
+std::deque<Level> Reader::parse_cfg(std::ifstream &file){
     std::string line;
-    std::vector<Level> level_list;
+    std::deque<Level> level_list;
 
     while (std::getline(file, line)){
         trim(line);

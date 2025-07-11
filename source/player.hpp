@@ -8,6 +8,7 @@
 class Player{
     private:
     std::deque<Position> nextpositions;
+    std::deque<Direction> nextdirection;
     public:
     //Methods
     virtual ~Player() = default;
@@ -17,6 +18,7 @@ class Player{
 
     //Getters
     std::deque<Position>& get_nextpositions();
+    std::deque<Direction>& get_nextdirection();
 
     //Setters
 };
