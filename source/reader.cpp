@@ -1,7 +1,5 @@
 #include "reader.hpp"
 #include "level.hpp"
-#include "simulation.hpp"
-#include <algorithm>
 #include <cctype>
 #include <cstddef>
 #include <fstream>

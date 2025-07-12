@@ -7,7 +7,8 @@
 #include "reader.hpp"
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
+
+#include "snake.hpp"
 #include <vector>
 
 class SnazeSimulation{
@@ -37,6 +38,7 @@ class SnazeSimulation{
     Player* my_player;
     std::vector<Level> m_levels;
     Reader read;
+    char m_head;
 
 
     public:
@@ -44,7 +46,8 @@ class SnazeSimulation{
     //Methods:
     void usage();
     void initialize(int, char*[]);
-    bool is_over();
+    bool is_over;
+    void startdirection();
     void process_events();
     void update();
     void render();

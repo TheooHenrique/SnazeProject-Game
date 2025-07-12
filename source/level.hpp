@@ -18,26 +18,31 @@ class Level{
     
 
     public:
-    Level(){
-
-    }
-    Level(size_t x, size_t y, Position spawn, std::string maze){
+    Level(){ }//Default constructor
+    Level(size_t x, size_t y, Position spawn, std::string maze){ //Constructor
         this->m_length = y;
         this->m_width = x;
         this->m_spawnpoint = spawn;
     }
+
+    public:
+    //Methods
+    void print_level(Level);
+    void place_food_in_maze(Position&);
+    void generate_food();
+
+    //Setters
     void set_width(size_t);
     void set_length(size_t);
     void set_maze(std::vector<std::string>);
     void set_food_amount(size_t);
     void set_spawnpoint(Position);
 
+    //Getters
     char get_item_pos(std::vector<std::string>, size_t, size_t);
-    void print_level(Level);
-    void place_food_in_maze(Position&);
     std::vector<std::string>& get_maze();
     Position get_spawnpoint();
-    Position generate_food();
+    Position& get_food_cords();
     
 };
 

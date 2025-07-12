@@ -3,15 +3,8 @@
 #include <random>
 #include <ctime>
 
-void Level::set_width(size_t width){this->m_width = width; }
-void Level::set_length(size_t len){this->m_length = len; }
-void Level::set_food_amount(size_t amount){this->food_amount = amount; }
-void Level::set_spawnpoint(Position spawn){ this->m_spawnpoint = spawn; }
-std::vector<std::string>& Level::get_maze(){ return this->m_level_maze; }
-Position Level::get_spawnpoint(){return m_spawnpoint;}
-
-
-Position Level::generate_food(){
+//Methods
+void Level::generate_food(){
     // Initializes the time-based random number generator
     static std::mt19937 rng(static_cast<unsigned int>(std::time(nullptr)));
 
@@ -35,13 +28,11 @@ Position Level::generate_food(){
 
     // If there are no valid positions, return an invalid position
     if (valid_positions.empty()) {
-        return Position{static_cast<size_t>(-1), static_cast<size_t>(-1)};
+        std::cerr << "The maze cannot generate any food!";
     }
 
     std::uniform_int_distribution<size_t> dist(0, valid_positions.size() - 1);
     m_food_coords = valid_positions[dist(rng)];
-
-    return m_food_coords;
 }
 
 void Level::place_food_in_maze(Position& m_food_cords_for_this_function) {
@@ -54,13 +45,18 @@ void Level::place_food_in_maze(Position& m_food_cords_for_this_function) {
 }
 
 //renderiza imprimindo todo o labirinto. se funcionar, 'f' estará no local indicado
+void Level::print_level(Level lvl){ for (int j{0}; j < lvl.get_maze().size(); ++j){ std::cout << lvl.get_maze()[j] << std::endl; } }
 
-void Level::print_level(Level lvl){
-    for (int j{0}; j < lvl.get_maze().size(); ++j){
-        std::cout << lvl.get_maze()[j] << std::endl;
-    }
-}
 
-char Level::get_item_pos(std::vector<std::string> layout, size_t x, size_t y){
-    return layout[y][x];
-}
+//Setters
+void Level::set_width(size_t width){ this->m_width = width; }
+void Level::set_length(size_t len){ this->m_length = len; }
+void Level::set_food_amount(size_t amount){ this->food_amount = amount; }
+void Level::set_spawnpoint(Position spawn){ this->m_spawnpoint = spawn; }
+
+
+//Getters
+std::vector<std::string>& Level::get_maze(){ return this->m_level_maze; }
+Position Level::get_spawnpoint(){ return m_spawnpoint; }
+char Level::get_item_pos(std::vector<std::string> layout, size_t x, size_t y){ return layout[y][x]; }
+Position &Level::get_food_cords(){ return this->m_food_coords; }
