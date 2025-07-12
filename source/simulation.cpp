@@ -63,13 +63,13 @@ void SnazeSimulation::initialize(int argc, char* argv[]){
                 if (selected_option == LIVES){try{aux = std::stoi(argv[ct + 1]);} catch(const std::runtime_error& e){std::cerr << "Error: You inserted a invalid type at lives option!\n";}}
                 if (selected_option == PLAYERTYPE){try{
                         if (strcmp(argv[ct+1], "backtracking") == 0){
-                            if (aux != -1){ my_player->get_snake().set_lives(aux);} //Tem que alterar isso aqui. Tem que setar o player como backtrack player
+                            if (aux != -1){ this->get_snake().set_lives(aux);} //Tem que alterar isso aqui. Tem que setar o player como backtrack player
                         }
                         else if(strcmp(argv[ct+1], "random") == 0){
-                            if (aux != -1){ my_player->get_snake().set_lives(aux) ;} //Tem que alterar isso aqui. Tem que setar o player como random player
+                            if (aux != -1){ this->get_snake().set_lives(aux) ;} //Tem que alterar isso aqui. Tem que setar o player como random player
                         } else{
                             std::cout << "WARNING: You inserted a invalid type at player type option! Starting with backtracking player by default.\n";
-                            if (aux != -1){ my_player->get_snake().set_lives(aux);}
+                            if (aux != -1){ this->get_snake().set_lives(aux);}
                         }
                 } catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at player type option!\n";}}
             }
@@ -80,7 +80,7 @@ void SnazeSimulation::initialize(int argc, char* argv[]){
 
 void SnazeSimulation::process_events(){
     if (m_current_state == RANDOM_SEARCH){
-        this->my_player->get_snake().set_position(m_current_lvl, 'c', m_current_lvl.get_spawnpoint());
+        this->get_snake().set_position(m_current_lvl, 'c', Position(m_current_lvl.get_spawnpoint().get_x(), m_current_lvl.get_spawnpoint().get_y() + 1) );
     }
 }
 
@@ -97,9 +97,14 @@ void SnazeSimulation::render(){
     }
 }
 
-bool SnazeSimulation::is_over(){return true; /*temporary*/}
+bool SnazeSimulation::is_over(){return false; /*temporary*/}
+
+//==================Setters===================
 void SnazeSimulation::set_fps(size_t value){ this->m_fps = value; }
 void SnazeSimulation::set_levels(std::vector<Level> lvl){ this->m_levels = lvl;}
+
+//==================Getters===================
 std::vector<Level> SnazeSimulation::get_levels(){ return this->m_levels; }
 Player SnazeSimulation::get_player(){ return *this->my_player; }
-Level SnazeSimulation::get_current_level(){ return this->m_current_lvl; }
+Level& SnazeSimulation::get_current_level() { return m_current_lvl; }
+Snake SnazeSimulation::get_snake(){return this->sn;}

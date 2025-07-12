@@ -35,7 +35,7 @@ Position Level::generate_food(){
 
     // If there are no valid positions, return an invalid position
     if (valid_positions.empty()) {
-        return Position{-1, -1};
+        return Position{static_cast<size_t>(-1), static_cast<size_t>(-1)};
     }
 
     std::uniform_int_distribution<size_t> dist(0, valid_positions.size() - 1);

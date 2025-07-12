@@ -6,7 +6,7 @@
 
 class Player{
     private:
-    Snake &sn = Snake::get_instance();
+    
 
     public:
     Snake get_snake();
