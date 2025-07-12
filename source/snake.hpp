@@ -14,9 +14,9 @@ class Snake{
     std::deque<Position> m_snake_body;
     Position m_current_pos;
     Position m_current_pos2;
+
     //Constructor:
     Snake(){
-        m_current_size = 1;
         m_current_score = 0;
         m_eaten_food = 0;
     }
@@ -27,6 +27,12 @@ class Snake{
         return sn;
     }
 
+    //Methods
+    void add_segment(const Position& pos);
+    void remove_last_segment();
+    void initialize_body(const Position& head_pos);
+
+
     //Getters
     Position get_current_pos();
     Position get_current_pos2();
@@ -35,9 +41,10 @@ class Snake{
     size_t get_eated();
     size_t get_lives();
     size_t get_score();
-    std::deque<Position> get_body();
+    std::deque<Position>& get_body();
 
     //Setters
+    
     void set_current_pos(Position);
     void set_current_pos2(Position);
     void set_dir(size_t);

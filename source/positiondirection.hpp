@@ -39,6 +39,8 @@ struct Direction{
 
     public:
 
+    bool operator==(const Direction& other){ return (this->m_current_dir == other.m_current_dir); } //Comparation (equal) operator
+
     //Setters
     void set_dir(size_t);
 

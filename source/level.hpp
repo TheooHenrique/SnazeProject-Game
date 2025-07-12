@@ -12,7 +12,7 @@ class Level{
     size_t m_length;
     std::vector<std::string> m_level_maze;
     
-    size_t food_amount;
+    size_t food_amount = 2;
     Position m_spawnpoint;
     Position m_food_coords;
     
@@ -39,6 +39,7 @@ class Level{
     void set_spawnpoint(Position);
 
     //Getters
+    size_t get_food_amount();
     char get_item_pos(std::vector<std::string>, size_t, size_t);
     std::vector<std::string>& get_maze();
     Position get_spawnpoint();

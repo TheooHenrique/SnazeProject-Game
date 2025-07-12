@@ -1,7 +1,6 @@
 #include "player.hpp"
 #include "positiondirection.hpp"
 #include <algorithm>
-#include <iostream>
 #include <random>
 #include <vector>
 //==============Player funct================
@@ -12,25 +11,30 @@ Direction Player::next_move(){
 };
 
 std::deque<Position>& Player::get_nextpositions(){return this->nextpositions;}
+std::deque<Direction>& Player::get_nextdirection(){ return this->nextdirection; }
 
 void Player::change_direction(Direction &dir){
     std::random_device rd;
     std::mt19937 g(rd());
-    std::vector<size_t> dirvec { Direction::UP, Direction::DOWN, Direction::LEFT, Direction::RIGHT};
+    std::vector<size_t> dirvec;
 
-    if (dir.m_current_dir == Direction::UP) {
-        dirvec.erase(std::remove(dirvec.begin(), dirvec.end(), Direction::DOWN), dirvec.end());
-        
-    } else if (dir.m_current_dir == Direction::DOWN) {
-        dirvec.erase(std::remove(dirvec.begin(), dirvec.end(), Direction::UP), dirvec.end());
-    } else if (dir.m_current_dir == Direction::LEFT) {
-        dirvec.erase(std::remove(dirvec.begin(), dirvec.end(), Direction::RIGHT), dirvec.end());
-    } else if (dir.m_current_dir == Direction::RIGHT) {
-        dirvec.erase(std::remove(dirvec.begin(), dirvec.end(), Direction::LEFT), dirvec.end());
+    if (dir.get_dir() == Direction::UP) {
+        dirvec = { Direction::LEFT, Direction::RIGHT};
+    } else if (dir.get_dir() == Direction::DOWN) {
+        dirvec = { Direction::LEFT, Direction::RIGHT};
+    } else if (dir.get_dir() == Direction::LEFT) {
+        dirvec = {Direction::UP, Direction::DOWN};
+    } else if (dir.get_dir() == Direction::RIGHT) {
+        dirvec = {Direction::UP, Direction::DOWN};
     }
 
-    std::shuffle(dirvec.begin(), dirvec.end(), g);
-    dir.m_current_dir = dirvec[0];
+    if (!dirvec.empty()){
+        std::shuffle(dirvec.begin(), dirvec.end(), g);
+        dir.set_dir(dirvec[0]);
+    } else{
+        
+    }
+
 }
 
 //Getters

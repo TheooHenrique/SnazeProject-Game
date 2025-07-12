@@ -9,7 +9,6 @@
 #include <cstdint>
 
 #include "snake.hpp"
-#include <vector>
 
 class SnazeSimulation{
 
@@ -36,7 +35,7 @@ class SnazeSimulation{
     size_t m_fps;
     Level m_current_lvl;
     Player* my_player;
-    std::vector<Level> m_levels;
+    std::deque<Level> m_levels;
     Reader read;
     char m_head;
 
@@ -54,13 +53,13 @@ class SnazeSimulation{
 
     //Setters
     void set_fps(size_t);
-    void set_levels(std::vector<Level>);
+    void set_levels(std::deque<Level>);
 
     //Getters
     Snake get_snake();
     Player get_player();
     Level& get_current_level ();
-    std::vector<Level> get_levels();
+    std::deque<Level> get_levels();
 
     //Singleton Pattern Implementation
     Snake &sn = Snake::get_instance();

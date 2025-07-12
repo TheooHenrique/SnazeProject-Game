@@ -48,6 +48,7 @@ void Level::place_food_in_maze(Position& m_food_cords_for_this_function) {
 void Level::print_level(Level lvl){ for (int j{0}; j < lvl.get_maze().size(); ++j){ std::cout << lvl.get_maze()[j] << std::endl; } }
 
 
+
 //Setters
 void Level::set_width(size_t width){ this->m_width = width; }
 void Level::set_length(size_t len){ this->m_length = len; }
@@ -56,6 +57,7 @@ void Level::set_spawnpoint(Position spawn){ this->m_spawnpoint = spawn; }
 
 
 //Getters
+size_t Level::get_food_amount(){ return this->food_amount; }
 std::vector<std::string>& Level::get_maze(){ return this->m_level_maze; }
 Position Level::get_spawnpoint(){ return m_spawnpoint; }
 char Level::get_item_pos(std::vector<std::string> layout, size_t x, size_t y){ return layout[y][x]; }
