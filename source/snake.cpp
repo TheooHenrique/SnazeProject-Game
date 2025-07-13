@@ -25,6 +25,7 @@ Position Snake::get_current_pos(){ return this->m_current_pos; }
 Position Snake::get_current_pos2(){ return this->m_current_pos2; }
 
 //Setters
+void Snake::set_body(std::deque<Position> bd){ this->m_snake_body = bd; }
 void Snake::set_current_pos(Position pos){ this->m_current_pos = pos; }
 void Snake::set_dir(size_t dir){ this->m_current_dir = dir;}
 void Snake::set_current_pos2(Position dir){ this->m_current_pos2 = dir; }

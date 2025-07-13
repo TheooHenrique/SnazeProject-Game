@@ -45,6 +45,7 @@ class Snake{
 
     //Setters
     
+    void set_body(std::deque<Position>);
     void set_current_pos(Position);
     void set_current_pos2(Position);
     void set_dir(size_t);

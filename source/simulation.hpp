@@ -38,6 +38,7 @@ class SnazeSimulation{
     std::deque<Level> m_levels;
     Reader read;
     char m_head;
+    bool dead;
 
 
     public:
