@@ -2,6 +2,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
+#include <deque>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -174,6 +175,21 @@ void SnazeSimulation::process_events(){
                 case Direction::LEFT:  new_pos.set_x(new_pos.get_x() - 1); break;
                 case Direction::RIGHT: new_pos.set_x(new_pos.get_x() + 1); break;
             }
+
+            // Check if the snake ate the food
+            if (new_pos == m_current_lvl.get_food_cords()) {
+                // Remove the old food
+                m_current_lvl.set_position(new_pos, ' ');
+
+                // Generate new food
+                m_current_lvl.generate_food();
+                m_current_lvl.place_food_in_maze(m_current_lvl.get_food_cords());
+
+                // Increase snake size and add a new segment
+                sn.add_segment(prev_head);
+                sn.set_size(sn.get_size() + 1);
+                sn.set_eated(sn.get_eated() + 1);
+            }
             
             // Change the head char before print
             char head_char;
@@ -188,7 +204,24 @@ void SnazeSimulation::process_events(){
             sn.set_position(m_current_lvl, head_char, new_pos);
             sn.set_current_pos(new_pos);
             m_head = head_char;
+
+            // Update the body of the snake
+            if (sn.get_size() > 1) {
+                std::deque<Position>& body = sn.get_body();
+                body.push_front(new_pos);
+                if (body.size() > sn.get_size()) {
+                    body.pop_back();
+                }
+            }
             
+            // Draw the body of the snake with 'o'
+            std::deque<Position>& body = sn.get_body();
+            for (const auto& seg : body) {
+                if (seg != sn.get_current_pos()) {
+                    sn.set_position(m_current_lvl, 'o', seg);
+                }
+            }
+ 
             // Delay TEM QUE COLOCAR PRA O PLAYER DECIDIR DEPOIS. DEFAULT VAI SER 500MS
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
@@ -227,7 +260,7 @@ void SnazeSimulation::render(){
     }
     else if (m_current_state == RANDOM_SEARCH){ std::cout << "\nThinking...\n"; }
     else if (m_current_state == WALKING){
-        std::cout << "Eaten Food: " << sn.get_eated() << std::endl;
+        std::cout << "Eaten Food: " << sn.get_eated() << ", Current Size: " << sn.get_size() << std::endl;
         m_current_lvl.print_level(m_current_lvl);
     }
     else if (m_current_state == WON_GAME){ std::cout << "\n==============================================\nCONGRATS!!!!!!!!!!!!!!!!!!!!\nYOU WON!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n==============================================\n";}
