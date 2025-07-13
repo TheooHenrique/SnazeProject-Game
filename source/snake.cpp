@@ -25,11 +25,11 @@ Position Snake::get_current_pos(){ return this->m_current_pos; }
 Position Snake::get_current_pos2(){ return this->m_current_pos2; }
 
 //Setters
-void Snake::set_current_pos(Position pos){ m_current_pos = pos; }
+void Snake::set_current_pos(Position pos){ this->m_current_pos = pos; }
 void Snake::set_dir(size_t dir){ this->m_current_dir = dir;}
 void Snake::set_current_pos2(Position dir){ this->m_current_pos2 = dir; }
 void Snake::set_size(size_t new_size){
-    m_current_size = new_size;
+    this->m_current_size = new_size;
 }
 void Snake::set_eated(size_t n){ this->m_eaten_food = n; }
 void Snake::set_lives(size_t){}

@@ -88,7 +88,7 @@ void SnazeSimulation::startdirection(){
     size_t choosen_value = vec[0];
     sn.set_dir(choosen_value);
     
- }
+}
 
 void SnazeSimulation::process_events(){
     if (m_current_state == READING_INPUT){
@@ -159,7 +159,12 @@ void SnazeSimulation::process_events(){
         if (!my_player->get_nextdirection().empty()) {
             Position prev_head = sn.get_current_pos();
 
-            // Clear the current position
+            Position old_tail;
+            if (!sn.get_body().empty()) {
+                old_tail = sn.get_body().back();
+            }
+
+            // Clear the current position (isso apaga a cabeça antiga, que pode ser o corpo antigo se a cobra tiver tamanho > 1)
             sn.set_position(m_current_lvl, ' ', sn.get_current_pos());
 
             // Get the next direction
@@ -176,14 +181,18 @@ void SnazeSimulation::process_events(){
                 case Direction::RIGHT: new_pos.set_x(new_pos.get_x() + 1); break;
             }
 
+            bool ate_comida = false;
+
             // Check if the snake ate the food
             if (new_pos == m_current_lvl.get_food_cords()) {
+                ate_comida = true;
+
                 // Remove the old food
                 m_current_lvl.set_position(new_pos, ' ');
 
                 // Generate new food
-                m_current_lvl.generate_food();
-                m_current_lvl.place_food_in_maze(m_current_lvl.get_food_cords());
+                /*m_current_lvl.generate_food();
+                m_current_lvl.place_food_in_maze(m_current_lvl.get_food_cords());*/
 
                 // Increase snake size and add a new segment
                 sn.add_segment(prev_head);
@@ -206,16 +215,23 @@ void SnazeSimulation::process_events(){
             m_head = head_char;
 
             // Update the body of the snake
+            std::deque<Position>& body = sn.get_body();
             if (sn.get_size() > 1) {
-                std::deque<Position>& body = sn.get_body();
                 body.push_front(new_pos);
                 if (body.size() > sn.get_size()) {
                     body.pop_back();
                 }
             }
             
+            if (!ate_comida && sn.get_size() > 1) {
+                // A posição `old_tail` pode ser a mesma da cabeça antiga se a cobra só tinha 1 segmento de corpo.
+                // Apagar de novo não tem problema, mas é mais seguro verificar se não é a cabeça atual.
+                if (old_tail != sn.get_current_pos()) {
+                     sn.set_position(m_current_lvl, ' ', old_tail);
+                }
+            }
+
             // Draw the body of the snake with 'o'
-            std::deque<Position>& body = sn.get_body();
             for (const auto& seg : body) {
                 if (seg != sn.get_current_pos()) {
                     sn.set_position(m_current_lvl, 'o', seg);
@@ -227,9 +243,8 @@ void SnazeSimulation::process_events(){
         }
     }//==================================================================================================================================
     else if (m_current_state == FOUND){
-        sn.set_eated(sn.get_eated() + 1);
-        //sn.get_body().push_back();
-        
+        // A lógica de comer já está no estado WALKING, aqui você pode deixar vazio ou preparar para o próximo nível.
+        // O `set_eated` foi movido para o local onde a comida é detectada para ser mais preciso.
     }
 }
 
@@ -239,15 +254,16 @@ void SnazeSimulation::update(){
     else if (m_current_state == WAITING_START){if (std::cin.get() == '\n') {m_current_state = RANDOM_SEARCH;}}//TEMPORÁRIO! Depois tem que fazer o backtracking!
     else if (m_current_state == RANDOM_SEARCH){m_current_state = WALKING; }
     else if (m_current_state == WALKING){
-            if (my_player->get_nextdirection().empty() || sn.get_current_pos() == m_current_lvl.get_food_cords()) { m_current_state = FOUND; }
+            // Se o caminho acabou, a cobra chegou ao destino (que pode ou não ser a comida)
+            if (my_player->get_nextdirection().empty()) { m_current_state = FOUND; }
             //else if (bateu) {m_current_state = DEAD}
         }
     else if (m_current_state == FOUND){
         if (sn.get_eated() == m_current_lvl.get_food_amount()){
             if (m_levels.empty()){ m_current_state = WON_GAME; }
-            else{ m_current_state = READING_INPUT; }
+            else{ m_current_state = READING_INPUT; } // Prepara próximo nível
         }
-        else { m_current_state = RANDOM_SEARCH; }
+        else { m_current_state = RANDOM_SEARCH; } // Procura próxima comida
     }
     else if (m_current_state == WON_GAME){ m_current_state = END; }
     else if (m_current_state == END){ this->is_over = true; }
