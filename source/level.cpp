@@ -54,6 +54,11 @@ void Level::set_width(size_t width){ this->m_width = width; }
 void Level::set_length(size_t len){ this->m_length = len; }
 void Level::set_food_amount(size_t amount){ this->food_amount = amount; }
 void Level::set_spawnpoint(Position spawn){ this->m_spawnpoint = spawn; }
+void Level::set_position(Position pos, char c) {
+    if (pos.get_y() < m_level_maze.size() && pos.get_x() < m_level_maze[pos.get_y()].size()) {
+        m_level_maze[pos.get_y()][pos.get_x()] = c;
+    }
+}
 
 
 //Getters

@@ -10,8 +10,16 @@ class Position{
     public:
     Position(){ } //Default constructor
     Position(size_t x, size_t y){ m_x = x; m_y = y; } //Receiving x and y constructor 
-    bool operator!=(const Position& other){ return (!(this->m_x == other.m_x && this->m_y == other.m_y)); } //Comparation (different) operator
-    bool operator==(const Position& other){ return (this->m_x == other.m_x && this->m_y == other.m_y); } //Comparation (equal) operator
+    /*bool operator!=(const Position& other){ return (!(this->m_x == other.m_x && this->m_y == other.m_y)); } //Comparation (different) operator
+    bool operator==(const Position& other){ return (this->m_x == other.m_x && this->m_y == other.m_y); }*/ //Comparation (equal) operator
+
+    bool operator==(const Position& other) const {
+        return m_x == other.m_x && m_y == other.m_y;
+    }
+
+    bool operator!=(const Position& other) const {
+        return !(*this == other);
+    }
 
     //Setters
     void set_y(size_t);
