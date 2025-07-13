@@ -13,7 +13,7 @@ class Player{
     //Methods
     virtual ~Player() = default;
     virtual Direction next_move();
-    bool check_if_next_is_playable(Level, Position, Direction);
+    bool check_if_next_is_playable(Level, Position, Direction, std::deque<Position>&);
     void change_direction(Direction&);
 
     //Getters
