@@ -14,6 +14,8 @@ class Player{
     virtual ~Player() = default;
     virtual Direction next_move();
     bool check_if_next_is_playable(Level, Position, Direction, std::deque<Position>&);
+    bool check_if_snake_is_prision(Level, Position, Direction, std::deque<Position>&);
+    bool is_snake_body( Position&,  std::deque<Position>&); 
     void change_direction(Direction&);
 
     //Getters
