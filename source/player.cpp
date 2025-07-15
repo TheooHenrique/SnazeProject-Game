@@ -53,9 +53,9 @@ bool Player::check_if_snake_is_prision(Level lvl, Position pos, Direction dir, s
         Position right_pos(pos.get_x() + 1, pos.get_y());
         Position left_pos(pos.get_x() - 1, pos.get_y());
 
-        if (((lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '.') && !is_snake_body(right_pos, snake_body))
-            && ((lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '.') && !is_snake_body(left_pos, snake_body))
-            && ((lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '.') && !is_snake_body(up_pos, snake_body))){
+        if (((lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '.') || is_snake_body(right_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '.') || is_snake_body(left_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '.') || is_snake_body(up_pos, snake_body))){
             return true;
         }
     }
@@ -65,9 +65,9 @@ bool Player::check_if_snake_is_prision(Level lvl, Position pos, Direction dir, s
         Position right_pos(pos.get_x() + 1, pos.get_y());
         Position left_pos(pos.get_x() - 1, pos.get_y());
 
-        if (((lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '.') && !is_snake_body(right_pos, snake_body))
-            && ((lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '.') && !is_snake_body(left_pos, snake_body))
-            && ((lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '.') && !is_snake_body(down_pos, snake_body))){
+        if (((lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '.') || is_snake_body(right_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '.') || is_snake_body(left_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '.') || is_snake_body(down_pos, snake_body))){
             return true;
         }
 
@@ -77,9 +77,9 @@ bool Player::check_if_snake_is_prision(Level lvl, Position pos, Direction dir, s
         Position down_pos(pos.get_x(), pos.get_y() + 1);
         Position left_pos(pos.get_x() - 1, pos.get_y());
 
-        if (((lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '.') && !is_snake_body(up_pos, snake_body))
-            && ((lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '.') && !is_snake_body(left_pos, snake_body))
-            && ((lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '.') && !is_snake_body(down_pos, snake_body))){
+        if (((lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '.') || is_snake_body(up_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '.') || is_snake_body(left_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '.') || is_snake_body(down_pos, snake_body))){
             return true;
         }
 
@@ -89,9 +89,9 @@ bool Player::check_if_snake_is_prision(Level lvl, Position pos, Direction dir, s
         Position down_pos(pos.get_x(), pos.get_y() + 1);
         Position right_pos(pos.get_x() + 1, pos.get_y());
 
-        if (((lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '.') && !is_snake_body(up_pos, snake_body))
-            && ((lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '.') && !is_snake_body(right_pos, snake_body))
-            && ((lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '.') && !is_snake_body(down_pos, snake_body))){
+        if (((lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '.') || is_snake_body(up_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '.') || is_snake_body(right_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '.') || is_snake_body(down_pos, snake_body))){
             return true;
         }
     }

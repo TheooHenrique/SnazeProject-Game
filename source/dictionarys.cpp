@@ -1,8 +1,10 @@
 #include "dictionarys.hpp"
-/*std::unordered_map<std::string, size_t> items_with_their_keys{
-    {"--help", HELP},
-    {"--fps", FPS},
-    {"--lives", LIVES},
-    {"--food", FOOD},
-    {"--playertype", PLAYERTYPE}
-};*/
+
+void Dictios::initialize_table(){
+    items_with_their_keys ["--help"] = HELP; 
+    items_with_their_keys ["--fps"] = FPS; 
+    items_with_their_keys ["--lives"] = LIVES; 
+    items_with_their_keys ["--food"] = FOOD; 
+    items_with_their_keys ["--playertype"] = PLAYERTYPE; 
+
+}
