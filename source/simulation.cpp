@@ -5,6 +5,7 @@
 #include <deque>
 #include <filesystem>
 #include <fstream>
+#include <initializer_list>
 #include <iostream>
 #include <random>
 #include <stdexcept>
@@ -28,6 +29,7 @@ void SnazeSimulation::usage(){
 }
 
 void SnazeSimulation::initialize(int argc, char* argv[]){
+    Dictios dicts;
     size_t aux = -1;
     size_t count{0};
     for (size_t ct{1}; ct < argc ; ++ct){
@@ -50,16 +52,17 @@ void SnazeSimulation::initialize(int argc, char* argv[]){
         }
         
         //Capturing the configurations
-        auto it{items_with_their_keys.find(argv[ct])};
+        dicts.initialize_table();
+        auto it{dicts.items_with_their_keys.find(argv[ct])};
         my_player = new Player();
-        if (it != items_with_their_keys.end()){
-            interface selected_option {it->second};
-            if (selected_option == HELP){usage(); exit(0);}
+        if (it != dicts.items_with_their_keys.end()){
+            Dictios::interface selected_option {it->second};
+            if (selected_option == dicts.HELP){usage(); exit(0);}
             if (ct + 1 < argc){
-                if (selected_option == FPS){try{set_fps(std::stoi(argv[ct + 1]));} catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at fps option!\n"; }}
-                if (selected_option == FOOD){try{m_current_lvl.set_food_amount(std::stoi(argv[ct + 1]));} catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at food option!\n";}}
-                if (selected_option == LIVES){try{aux = std::stoi(argv[ct + 1]);} catch(const std::runtime_error& e){std::cerr << "Error: You inserted a invalid type at lives option!\n";}}
-                if (selected_option == PLAYERTYPE){try{
+                if (selected_option == dicts.FPS){try{set_fps(std::stoi(argv[ct + 1]));} catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at fps option!\n"; }}
+                if (selected_option == dicts.FOOD){try{m_current_lvl.set_food_amount(std::stoi(argv[ct + 1]));} catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at food option!\n";}}
+                if (selected_option == dicts.LIVES){try{aux = std::stoi(argv[ct + 1]);} catch(const std::runtime_error& e){std::cerr << "Error: You inserted a invalid type at lives option!\n";}}
+                if (selected_option == dicts.PLAYERTYPE){try{
                         if (strcmp(argv[ct+1], "backtracking") == 0){
                             if (aux != -1){ this->get_snake().set_lives(aux);} //Tem que alterar isso aqui. Tem que setar o player como backtrack player
                             my_player = new Player();
@@ -95,6 +98,7 @@ void SnazeSimulation::process_events(){
         dead = false;
         m_current_lvl = m_levels[0];
         sn.set_eated(0);
+        sn.set_size(1);
         //Defining first direction of snake head
         startdirection();
 
@@ -121,8 +125,6 @@ void SnazeSimulation::process_events(){
         if (dead) { return; }
         m_current_lvl.generate_food();
         m_current_lvl.place_food_in_maze(m_current_lvl.get_food_cords());
-        
-
 
         //Cobra "VIRTUAL" para simular que ta andando
         Position current_pos_for_search = sn.get_current_pos();
@@ -160,7 +162,7 @@ void SnazeSimulation::process_events(){
                 }
 
                 //VERIFICA SE A COBRA NÃO ESTÁ SEM SAÍDA
-                if (possib_dir.empty()){/*dead = true;*/ break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
+                if (possib_dir.empty()){break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
                 //RANDOMIZA A ESCOLHA DA COBRA BURRA
                 std::shuffle(possib_dir.begin(), possib_dir.end(), g);
 
@@ -432,7 +434,7 @@ void SnazeSimulation::process_events(){
                     sn.set_position(m_current_lvl, 'o', seg);
                 }
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
 
     }//==================================================================================================================================

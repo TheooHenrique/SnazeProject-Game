@@ -8,9 +8,6 @@ void Snake::remove_last_segment() {
 }
 
 void Snake::initialize_body(const Position& head_pos) {
-    // Quando a cobra nasce, seu corpo está vazio ou tem apenas a cabeça
-    // Se você quiser que ela comece com um corpo de tamanho 1, por exemplo:
-    // m_snake_body.push_front(head_pos); // Ou alguma posição adjacente, dependendo da sua regra de início
     m_snake_body.clear(); // Clear Previous Body
 }
 
