@@ -36,6 +36,69 @@ void Player::change_direction(Direction &dir){
 
 }
 
+bool Player::is_snake_body( Position& check_pos,  std::deque<Position>& snake_body) {
+    for (auto& segment_pos : snake_body) {
+        if (check_pos.get_x() == segment_pos.get_x() && check_pos.get_y() == segment_pos.get_y()) {
+            return true; // A posição faz parte do corpo da cobra
+        }
+    }
+    return false; // A posição não faz parte do corpo da cobra
+}
+
+bool Player::check_if_snake_is_prision(Level lvl, Position pos, Direction dir, std::deque<Position>& snake_body){
+
+    //CHECK IF THE SNAKE IS AT PRISION IF THE SNAKE IS GOING UP
+    if (dir == Direction::UP){
+        Position up_pos(pos.get_x(), pos.get_y() - 1);
+        Position right_pos(pos.get_x() + 1, pos.get_y());
+        Position left_pos(pos.get_x() - 1, pos.get_y());
+
+        if (((lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '.') && !is_snake_body(right_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '.') && !is_snake_body(left_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '.') && !is_snake_body(up_pos, snake_body))){
+            return true;
+        }
+    }
+    //CHECK IF THE SNAKE IS AT PRISION IF THE SNAKE IS GOING DOWN
+    else if (dir == Direction::DOWN){
+        Position down_pos(pos.get_x(), pos.get_y() + 1);
+        Position right_pos(pos.get_x() + 1, pos.get_y());
+        Position left_pos(pos.get_x() - 1, pos.get_y());
+
+        if (((lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '.') && !is_snake_body(right_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '.') && !is_snake_body(left_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '.') && !is_snake_body(down_pos, snake_body))){
+            return true;
+        }
+
+    }
+    else if (dir == Direction::LEFT){
+        Position up_pos(pos.get_x(), pos.get_y() - 1);
+        Position down_pos(pos.get_x(), pos.get_y() + 1);
+        Position left_pos(pos.get_x() - 1, pos.get_y());
+
+        if (((lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '.') && !is_snake_body(up_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), left_pos.get_x(), left_pos.get_y()) == '.') && !is_snake_body(left_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '.') && !is_snake_body(down_pos, snake_body))){
+            return true;
+        }
+
+    }
+    else if (dir == Direction::RIGHT){
+        Position up_pos(pos.get_x(), pos.get_y() - 1);
+        Position down_pos(pos.get_x(), pos.get_y() + 1);
+        Position right_pos(pos.get_x() + 1, pos.get_y());
+
+        if (((lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), up_pos.get_x(), up_pos.get_y()) == '.') && !is_snake_body(up_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), right_pos.get_x(), right_pos.get_y()) == '.') && !is_snake_body(right_pos, snake_body))
+            && ((lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), down_pos.get_x(), down_pos.get_y()) == '.') && !is_snake_body(down_pos, snake_body))){
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Player::check_if_next_is_playable(Level lvl, Position pos, Direction dir, std::deque<Position>& snake_body){
     Position next_pos;
 
@@ -50,42 +113,21 @@ bool Player::check_if_next_is_playable(Level lvl, Position pos, Direction dir, s
         next_pos = Position(pos.get_x() + 1, pos.get_y());
     }
 
-    // 1. Verificar colisão com paredes ou paredes invisíveis
+    //checking the colision with the wall
     char item_at_next_pos = lvl.get_item_pos(lvl.get_maze(), next_pos.get_x(), next_pos.get_y());
     if (item_at_next_pos == '#' || item_at_next_pos == '.') {
-        return false; // Colidiu com parede ou parede invisível
+        return false; 
     }
 
-    // 2. Verificar colisão com o próprio corpo da cobra
-    // Começamos a partir do segundo elemento para evitar a cabeça da cobra
-    // já que a cabeça estará na `next_pos` após o movimento.
+    //Checking the colision with snake body
     for (size_t i = 0; i < snake_body.size(); ++i) { // Ajuste para não verificar a cabeça
         if (next_pos.get_x() == snake_body[i].get_x() && next_pos.get_y() == snake_body[i].get_y()) {
-            return false; // Colidiu com o corpo da cobra
+            return false;
         }
     }
-    
-    return true; // A próxima posição é jogável
+    //Case dont colide:
+    return true; 
 
-
-
-
-
-
-
-
-
-    /*
-    //Checking up
-    if ((dir.m_current_dir == 0) && (lvl.get_item_pos(lvl.get_maze(), pos.get_x(), pos.get_y() - 1) == '#' || lvl.get_item_pos(lvl.get_maze(), pos.get_x(), pos.get_y() - 1) == '.' )){ return false; }
-    //Checking down
-    else if (((dir.m_current_dir == 1)) && (lvl.get_item_pos(lvl.get_maze(), pos.get_x(), pos.get_y() + 1) == '#' || lvl.get_item_pos(lvl.get_maze(), pos.get_x(), pos.get_y() + 1) == '.')){ return false; }
-    //Checking left
-    else if (((dir.m_current_dir == 2)) && (lvl.get_item_pos(lvl.get_maze(), pos.get_x() - 1, pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), pos.get_x() - 1, pos.get_y()) == '.')){ return false; }
-    //Checking right
-    else if (((dir.m_current_dir == 3)) && (lvl.get_item_pos(lvl.get_maze(), pos.get_x() + 1, pos.get_y()) == '#' || lvl.get_item_pos(lvl.get_maze(), pos.get_x() + 1, pos.get_y()) == '.')){ return false; }
-    return true;
-    */
 }
 
 //Getters

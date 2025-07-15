@@ -92,6 +92,7 @@ void SnazeSimulation::startdirection(){
 
 void SnazeSimulation::process_events(){
     if (m_current_state == READING_INPUT){
+        dead = false;
         m_current_lvl = m_levels[0];
         sn.set_eated(0);
         //Defining first direction of snake head
@@ -117,170 +118,323 @@ void SnazeSimulation::process_events(){
     else if (m_current_state == WAITING_START){  }
     //==================================================================================================================================
     else if (m_current_state == RANDOM_SEARCH){
+        if (dead) { return; }
         m_current_lvl.generate_food();
         m_current_lvl.place_food_in_maze(m_current_lvl.get_food_cords());
+        
 
+
+        //Cobra "VIRTUAL" para simular que ta andando
         Position current_pos_for_search = sn.get_current_pos();
         Direction current_dir_for_search = sn.get_dir();
+        std::deque<Position> simulated_body = sn.get_body();
+        size_t simulated_snake_size = sn.get_size();
+
 
         //Clear the previous deque of decisions
         my_player->get_nextdirection().clear(); 
 
         std::random_device rd;
         std::mt19937 g(rd());
-        std::vector<std::string> shuf = {"go", "turn"};
-
+        std::vector<Direction> possib_dir;
 
         size_t max_search_iterations = 100000; 
         size_t current_iteration = 0;
 
         while(current_pos_for_search != m_current_lvl.get_food_cords() && current_iteration < max_search_iterations){
             ++current_iteration;
+            Position next_step_pos = current_pos_for_search;
 
-            if (!my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::UP, sn.get_body()) 
-                && !my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::DOWN, sn.get_body())
-                && !my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::LEFT, sn.get_body())
-                && !my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::RIGHT, sn.get_body())){
-                    dead = true;
-                }
-
-            if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, current_dir_for_search, sn.get_body()) && !dead){
-
-                //DECIDES IF THE SNAKE IS GOING TO ADVANCE OR TURN DIRECTION
-                std::shuffle(shuf.begin(), shuf.end(), g); 
-                    if (shuf[0] == "go"){
-                        Position next_step_pos = current_pos_for_search;
+            //ALTERAÇÃO RADICAL NA MUDANÇA DE MOVIMENTO DA COBRA BURRA:
+            //-------------------------------------------------------- CASO A COBRA ESTEJA VIRADA PARA CIMA -------------------------------------------------------- 
+            if (current_dir_for_search == Direction::UP){
                 
-                        if (current_dir_for_search.m_current_dir == Direction::UP) {
-                            next_step_pos.set_y(next_step_pos.get_y() - 1); //MOVE THE SNAKE WHILE THINKING
-                            if (sn.get_size() > 1) { //REFRESH THE SNAKE BODY:
-                                sn.get_body().push_front(current_pos_for_search);
-                                if (sn.get_body().size() > sn.get_size()) {
-                                    sn.get_body().pop_back(); } }
-                            my_player->get_nextdirection().push_back(Direction::UP);//FEED THE SOLUTION DEQUE
-                        }
-                        else if (current_dir_for_search.m_current_dir == Direction::DOWN) {
-                            next_step_pos.set_y(next_step_pos.get_y() + 1);
-                            if (sn.get_size() > 1) {
-                                sn.get_body().push_front(current_pos_for_search);
-                                if (sn.get_body().size() > sn.get_size()) {
-                                    sn.get_body().pop_back(); } }
-                            my_player->get_nextdirection().push_back(Direction::DOWN); 
-                        }
-                        else if (current_dir_for_search.m_current_dir == Direction::LEFT) {
-                            next_step_pos.set_x(next_step_pos.get_x() - 1);
-                            if (sn.get_size() > 1) {
-                                sn.get_body().push_front(current_pos_for_search);
-                                if (sn.get_body().size() > sn.get_size()) {
-                                    sn.get_body().pop_back(); } }
-                            my_player->get_nextdirection().push_back(Direction::LEFT);
-                        }
-                        else if (current_dir_for_search.m_current_dir == Direction::RIGHT) {
-                            next_step_pos.set_x(next_step_pos.get_x() + 1);
-                            if (sn.get_size() > 1) {
-                                sn.get_body().push_front(current_pos_for_search);
-                                if (sn.get_body().size() > sn.get_size()) {
-                                    sn.get_body().pop_back(); } }
-                            my_player->get_nextdirection().push_back(Direction::RIGHT);
-                        }
-                        //REFRESH THE SNAKE POSITION
-                        current_pos_for_search = next_step_pos;
-                    } 
-                    else if (shuf[0] == "turn"){
-                        my_player->change_direction(current_dir_for_search);
-                    }
+                possib_dir.clear();
+                //VERIFICA QUAIS POSIÇÕES ESTÃO LIVRES E ARMAZENA EM POSSIB_DIR (VECTOR)
+                if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::UP, simulated_body)){//TALVEZ O GETBODY ESTEJA ERRADO PORQUE RETORNA O CORPO REAL DA COBRA
+                    possib_dir.push_back(Direction::UP);
+                }if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::LEFT, simulated_body)){
+                    possib_dir.push_back(Direction::LEFT);
+                }if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::RIGHT, simulated_body)){
+                    possib_dir.push_back(Direction::RIGHT);
                 }
-            else if (!dead){ my_player->change_direction(current_dir_for_search); }
+
+                //VERIFICA SE A COBRA NÃO ESTÁ SEM SAÍDA
+                if (possib_dir.empty()){/*dead = true;*/ break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
+                //RANDOMIZA A ESCOLHA DA COBRA BURRA
+                std::shuffle(possib_dir.begin(), possib_dir.end(), g);
+
+                //CASO ELA ESCOLHA SE MANTER INDO UP, ANDE
+                if (possib_dir[0] == Direction::UP){
+                    next_step_pos.set_y(next_step_pos.get_y() - 1); //MOVE THE SNAKE WHILE THINKING
+                    if (simulated_snake_size > 1) { //REFRESH THE SNAKE BODY: TALVEZ TENHA QUE ALTERAR PQ GET_BODY RETORNA O CORPO REAL DA COBRA <----------------------
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::UP);//FEED THE SOLUTION DEQUE
+                }
+                //CASO ELA ESCOLHA IR PARA A ESQUERDA, VIRE PARA A ESQUERDA E ANDE
+                else if (possib_dir[0] == Direction::LEFT){
+                    current_dir_for_search = Direction::LEFT;
+                    next_step_pos.set_x(next_step_pos.get_x() - 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::LEFT);
+                }
+                //CASO ELA ESCOLHA IR PARA A ESQUERDA, VIRE PARA A DIREITA E ANDE
+                else if (possib_dir[0] == Direction::RIGHT){
+                    current_dir_for_search = Direction::RIGHT;
+                    next_step_pos.set_x(next_step_pos.get_x() + 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::RIGHT);
+                }
+            }
+            //-------------------------------------------------------- CASO A COBRA ESTEJA VIRADA PARA BAIXO -------------------------------------------------------- 
+            else if (current_dir_for_search == Direction::DOWN){
+                                
+                possib_dir.clear();
+                //VERIFICA QUAIS POSIÇÕES ESTÃO LIVRES E ARMAZENA EM POSSIB_DIR (VECTOR)
+                if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::DOWN, simulated_body)){//TALVEZ O GETBODY ESTEJA ERRADO PORQUE RETORNA O CORPO REAL DA COBRA
+                    possib_dir.push_back(Direction::DOWN);
+                }if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::LEFT, simulated_body)){
+                    possib_dir.push_back(Direction::LEFT);
+                }if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::RIGHT, simulated_body)){
+                    possib_dir.push_back(Direction::RIGHT);
+                }
+
+                //VERIFICA SE A COBRA NÃO ESTÁ SEM SAÍDA
+                if (possib_dir.empty()){break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
+
+                //RANDOMIZA A ESCOLHA DA COBRA BURRA
+                std::shuffle(possib_dir.begin(), possib_dir.end(), g);
+
+                //CASO ELA ESCOLHA SE MANTER INDO DOWN, ANDE
+                if (possib_dir[0] == Direction::DOWN){
+                    next_step_pos.set_y(next_step_pos.get_y() + 1); //MOVE THE SNAKE WHILE THINKING
+                    if (simulated_snake_size > 1) { //REFRESH THE SNAKE BODY: TALVEZ TENHA QUE ALTERAR PQ GET_BODY RETORNA O CORPO REAL DA COBRA <----------------------
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::DOWN);//FEED THE SOLUTION DEQUE
+                }
+                //CASO ELA ESCOLHA IR PARA A ESQUERDA, VIRE PARA A ESQUERDA E ANDE
+                else if (possib_dir[0] == Direction::LEFT){
+                    current_dir_for_search = Direction::LEFT;
+                    next_step_pos.set_x(next_step_pos.get_x() - 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::LEFT);
+                }
+                //CASO ELA ESCOLHA IR PARA A ESQUERDA, VIRE PARA A DIREITA E ANDE
+                else if (possib_dir[0] == Direction::RIGHT){
+                    current_dir_for_search = Direction::RIGHT;
+                    next_step_pos.set_x(next_step_pos.get_x() + 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::RIGHT);
+                }
+            }
+            //-------------------------------------------------------- CASO A COBRA ESTEJA VIRADA PARA A ESQUERDA -------------------------------------------------------- 
+            else if (current_dir_for_search == Direction::LEFT){
+
+                possib_dir.clear();
+                //VERIFICA QUAIS POSIÇÕES ESTÃO LIVRES E ARMAZENA EM POSSIB_DIR (VECTOR)
+                if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::LEFT, simulated_body)){//TALVEZ O GETBODY ESTEJA ERRADO PORQUE RETORNA O CORPO REAL DA COBRA
+                    possib_dir.push_back(Direction::LEFT);
+                } if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::UP, simulated_body)){
+                    possib_dir.push_back(Direction::UP);
+                } if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::DOWN, simulated_body)){
+                    possib_dir.push_back(Direction::DOWN);
+                }
+
+                //VERIFICA SE A COBRA NÃO ESTÁ SEM SAÍDA
+                if (possib_dir.empty()){break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
+
+                //RANDOMIZA A ESCOLHA DA COBRA BURRA
+                std::shuffle(possib_dir.begin(), possib_dir.end(), g);
+
+                //CASO ELA ESCOLHA SE MANTER INDO LEFT, ANDE
+                if (possib_dir[0] == Direction::LEFT){
+                    next_step_pos.set_x(next_step_pos.get_x() - 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::LEFT);
+                }
+                //CASO ELA ESCOLHA IR PARA CIMA, VIRE PARA CIMA E ANDE
+                else if (possib_dir[0] == Direction::UP){
+                    current_dir_for_search = Direction::UP;
+                    next_step_pos.set_y(next_step_pos.get_y() - 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::UP);
+                }
+                //CASO ELA ESCOLHA IR PARA BAIXO, VIRE PARA BAIXO E ANDE
+                else if (possib_dir[0] == Direction::DOWN){
+                    current_dir_for_search = Direction::DOWN;
+                    next_step_pos.set_y(next_step_pos.get_y() + 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::DOWN);
+                }
+            }
+            //-------------------------------------------------------- CASO A COBRA ESTEJA VIRADA PARA A DIREITA -------------------------------------------------------- 
+            else if (current_dir_for_search == Direction::RIGHT){
+
+                possib_dir.clear();
+                //VERIFICA QUAIS POSIÇÕES ESTÃO LIVRES E ARMAZENA EM POSSIB_DIR (VECTOR)
+                if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::RIGHT, simulated_body)){//TALVEZ O GETBODY ESTEJA ERRADO PORQUE RETORNA O CORPO REAL DA COBRA
+                    possib_dir.push_back(Direction::RIGHT);
+                } if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::UP, simulated_body)){
+                    possib_dir.push_back(Direction::UP);
+                } if (my_player->check_if_next_is_playable(m_current_lvl, current_pos_for_search, Direction::DOWN, simulated_body)){
+                    possib_dir.push_back(Direction::DOWN);
+                }
+
+                //VERIFICA SE A COBRA NÃO ESTÁ SEM SAÍDA
+                if (possib_dir.empty()){break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
+
+                //RANDOMIZA A ESCOLHA DA COBRA BURRA
+                std::shuffle(possib_dir.begin(), possib_dir.end(), g);
+
+                //CASO ELA ESCOLHA SE MANTER INDO RIGHT, ANDE
+                if (possib_dir[0] == Direction::RIGHT){
+                    next_step_pos.set_x(next_step_pos.get_x() + 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::RIGHT);
+                }
+                //CASO ELA ESCOLHA IR PARA CIMA, VIRE PARA CIMA E ANDE
+                else if (possib_dir[0] == Direction::UP){
+                    current_dir_for_search = Direction::UP;
+                    next_step_pos.set_y(next_step_pos.get_y() - 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::UP);
+                }
+                //CASO ELA ESCOLHA IR PARA BAIXO, VIRE PARA BAIXO E ANDE
+                else if (possib_dir[0] == Direction::DOWN){
+                    current_dir_for_search = Direction::DOWN;
+                    next_step_pos.set_y(next_step_pos.get_y() + 1);
+                    if (simulated_snake_size > 1) {
+                        simulated_body.push_front(current_pos_for_search);
+                        if (simulated_body.size() > simulated_snake_size) {
+                            simulated_body.pop_back(); } }
+                    my_player->get_nextdirection().push_back(Direction::DOWN);
+                }
+            }
+            //Refresh the current position of the snake
+            current_pos_for_search = next_step_pos;
+
         }
 
-        if (current_pos_for_search != m_current_lvl.get_food_cords()){//Caso ache a comida, adiciona novo corpo à cobra (apenas no pensamento)
-            sn.add_segment(current_pos_for_search);
-        }
     }//==================================================================================================================================
     else if (m_current_state == WALKING){
         {std::cout << "\nTAMANHO DO VETOR DE DECISOES: " << my_player->get_nextdirection().size() << std::endl;}
 
+        if (my_player->get_nextdirection().empty()) {
+                // Verifica se a cobra está encurralada
+                if (my_player->check_if_snake_is_prision(m_current_lvl, sn.get_current_pos(), sn.get_dir(), sn.get_body())) {
+                    sn.set_position(m_current_lvl, 'X', sn.get_current_pos());
+                    dead = true;
+                    std::cout << "\nBATEU! A cobra não tem para onde ir!\n";
+                }
+            }
+
         if (!my_player->get_nextdirection().empty()) {
-            Position prev_head = sn.get_current_pos();
-
-            Position old_tail;
-            if (!sn.get_body().empty()) {
-                old_tail = sn.get_body().back();
-            }
-
-            // Clear the current position (isso apaga a cabeça antiga, que pode ser o corpo antigo se a cobra tiver tamanho > 1)
-            sn.set_position(m_current_lvl, ' ', sn.get_current_pos());
-
-            // Get the next direction
-            Direction next_dir = my_player->get_nextdirection().front();
-            my_player->get_nextdirection().pop_front();
-            sn.set_dir(next_dir.m_current_dir);
-
-            // Change the previous position of the snake to the new position
-            Position new_pos = sn.get_current_pos();
-            switch(next_dir.m_current_dir) {
-                case Direction::UP:    new_pos.set_y(new_pos.get_y() - 1); break;
-                case Direction::DOWN:  new_pos.set_y(new_pos.get_y() + 1); break;
-                case Direction::LEFT:  new_pos.set_x(new_pos.get_x() - 1); break;
-                case Direction::RIGHT: new_pos.set_x(new_pos.get_x() + 1); break;
-            }
-
-            bool ate_comida = false;
-
-            // Check if the snake ate the food
-            if (new_pos == m_current_lvl.get_food_cords()) {
-                ate_comida = true;
-
-                // Remove the old food
-                m_current_lvl.set_position(new_pos, ' ');
-
-                // Increase snake size and add a new segment
-                sn.add_segment(prev_head);
-                sn.set_size(sn.get_size() + 1);
-                sn.set_eated(sn.get_eated() + 1);
-            }
-            
-            // Change the head char before print
-            char head_char;
-            switch(next_dir.m_current_dir) {
-                case Direction::UP:    head_char = '^'; break;
-                case Direction::DOWN:  head_char = 'v'; break;
-                case Direction::LEFT:  head_char = '<'; break;
-                case Direction::RIGHT: head_char = '>'; break;
-            }
-            
-            // Finally moves the snake
-            sn.set_position(m_current_lvl, head_char, new_pos);
-            sn.set_current_pos(new_pos);
-            m_head = head_char;
-
-            // Update the body of the snake
-            std::deque<Position>& body = sn.get_body();
-            if (sn.get_size() > 1) {
-                body.push_front(new_pos);
-                if (body.size() > sn.get_size()) {
-                    body.pop_back();
+                Position prev_head = sn.get_current_pos();
+                Position old_tail;
+                bool has_body_to_remove = false;
+                
+                if (!sn.get_body().empty()) {
+                    old_tail = sn.get_body().back();
+                    has_body_to_remove = true;
                 }
-            }
-            
-            if (!ate_comida && sn.get_size() > 1) {
-                // A posição `old_tail` pode ser a mesma da cabeça antiga se a cobra só tinha 1 segmento de corpo.
-                // Apagar de novo não tem problema, mas é mais seguro verificar se não é a cabeça atual.
-                if (old_tail != sn.get_current_pos()) {
-                     sn.set_position(m_current_lvl, ' ', old_tail);
-                }
-            }
 
-            // Draw the body of the snake with 'o'
-            for (const auto& seg : body) {
-                if (seg != sn.get_current_pos()) {
+                // Clear the current head position
+                sn.set_position(m_current_lvl, ' ', prev_head);
+
+                // Get next direction and calculate new position
+                Direction next_dir = my_player->get_nextdirection().front();
+                my_player->get_nextdirection().pop_front();
+                sn.set_dir(next_dir.m_current_dir);
+
+                Position new_pos = prev_head;
+                switch(next_dir.m_current_dir) {
+                    case Direction::UP:    new_pos.set_y(new_pos.get_y() - 1); break;
+                    case Direction::DOWN:  new_pos.set_y(new_pos.get_y() + 1); break;
+                    case Direction::LEFT:  new_pos.set_x(new_pos.get_x() - 1); break;
+                    case Direction::RIGHT: new_pos.set_x(new_pos.get_x() + 1); break;
+                }
+
+                bool ate_comida = (new_pos == m_current_lvl.get_food_cords());
+
+                // Handle food eating
+                if (ate_comida) {
+                    m_current_lvl.set_position(new_pos, ' ');
+                    sn.set_eated(sn.get_eated() + 1);
+                    // We'll grow by keeping the tail in place next move
+                }
+
+                // Update body before moving head
+                std::deque<Position>& body = sn.get_body();
+                if (sn.get_size() > 1) {
+                    body.push_front(prev_head);
+                    
+                    // If didn't eat, remove tail
+                    if (!ate_comida && body.size() > sn.get_size() - 1) {
+                        sn.set_position(m_current_lvl, ' ', old_tail);
+                        body.pop_back();
+                    }
+                } else if (ate_comida) {
+                    // Special case: first body segment when size was 1
+                    body.push_front(prev_head);
+                }
+
+                // Update snake size if ate food
+                if (ate_comida) {
+                    sn.set_size(sn.get_size() + 1);
+                }
+
+                // Set new head position
+                char head_char;
+                switch(next_dir.m_current_dir) {
+                    case Direction::UP:    head_char = '^'; break;
+                    case Direction::DOWN:  head_char = 'v'; break;
+                    case Direction::LEFT:  head_char = '<'; break;
+                    case Direction::RIGHT: head_char = '>'; break;
+                }
+                
+                sn.set_position(m_current_lvl, head_char, new_pos);
+                sn.set_current_pos(new_pos);
+                m_head = head_char;
+
+                // Draw body segments
+                for (const auto& seg : body) {
                     sn.set_position(m_current_lvl, 'o', seg);
                 }
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
             }
 
-            // Delay TEM QUE COLOCAR PRA O PLAYER DECIDIR DEPOIS. DEFAULT VAI SER 500MS
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        }
     }//==================================================================================================================================
 }
 
@@ -288,11 +442,16 @@ void SnazeSimulation::update(){
     if (m_current_state == START){ m_current_state = READING_INPUT; }
     else if (m_current_state == READING_INPUT){ m_current_state = WAITING_START; }
     else if (m_current_state == WAITING_START){if (std::cin.get() == '\n') {m_current_state = RANDOM_SEARCH;}}//TEMPORÁRIO! Depois tem que fazer o backtracking!
-    else if (m_current_state == RANDOM_SEARCH){m_current_state = WALKING; }
+    else if (m_current_state == RANDOM_SEARCH){
+        if (dead){ m_current_state = DEAD; }
+        else {m_current_state = WALKING; }
+    }
     else if (m_current_state == WALKING){
-            // Se o caminho acabou, a cobra chegou ao destino (que pode ou não ser a comida)
-            if (my_player->get_nextdirection().empty()) { m_current_state = FOUND; }
-            else if (my_player->get_nextdirection().empty() || dead) {m_current_state = DEAD; }
+        if (dead){
+            m_current_state = DEAD;
+        }
+        else if (my_player->get_nextdirection().empty()) { m_current_state = FOUND; }
+
         }
     else if (m_current_state == FOUND){
         if (sn.get_eated() == m_current_lvl.get_food_amount()){
@@ -317,7 +476,12 @@ void SnazeSimulation::render(){
         m_current_lvl.print_level(m_current_lvl);
     }
     else if (m_current_state == WON_GAME){ std::cout << "\n==============================================\nCONGRATS!!!!!!!!!!!!!!!!!!!!\nYOU WON!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n==============================================\n";}
-    else if (m_current_state == DEAD){ std::cout << "\n Você morreu!!!!!!!!!!!\n";}
+    else if (m_current_state == DEAD){
+        m_current_lvl.print_level(m_current_lvl);
+        std::cout << "\n================================\n";
+        std::cout << "BATEU! A cobra não tem saída!\n";
+        std::cout << "================================\n";
+    }
 }
 
 //Alterar essa coisa horrorosa aqui em cima depois.
