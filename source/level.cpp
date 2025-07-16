@@ -47,6 +47,14 @@ void Level::place_food_in_maze(Position& m_food_cords_for_this_function) {
 //renderiza imprimindo todo o labirinto. se funcionar, 'f' estará no local indicado
 void Level::print_level(Level lvl){ for (int j{0}; j < lvl.get_maze().size(); ++j){ std::cout << lvl.get_maze()[j] << std::endl; } }
 
+bool Level::there_is_food_at_maze(){
+    for (size_t y{0}; y < m_level_maze.size(); ++y){
+        for (size_t x{0}; x < m_level_maze[y].length(); ++x){
+            if ( m_level_maze[y][x] == 'f'){return true;}
+        }
+    }
+     return false;   
+}
 
 
 //Setters
@@ -62,7 +70,7 @@ void Level::set_position(Position pos, char c) {
 
 
 //Getters
-size_t Level::get_food_amount(){ return this->food_amount; }
+size_t& Level::get_food_amount(){ return this->food_amount; }
 std::vector<std::string>& Level::get_maze(){ return this->m_level_maze; }
 Position Level::get_spawnpoint(){ return m_spawnpoint; }
 char Level::get_item_pos(std::vector<std::string> layout, size_t x, size_t y){ return layout[y][x]; }

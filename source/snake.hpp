@@ -9,7 +9,7 @@ class Snake{
     Direction m_current_dir;
     size_t m_current_size{1};
     size_t m_eaten_food{0};
-    size_t m_lives;
+    size_t m_lives{5};
     size_t m_current_score;
     std::deque<Position> m_snake_body;
     Position m_current_pos;

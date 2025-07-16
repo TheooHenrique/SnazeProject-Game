@@ -30,7 +30,7 @@ void Snake::set_size(size_t new_size){
     this->m_current_size = new_size;
 }
 void Snake::set_eated(size_t n){ this->m_eaten_food = n; }
-void Snake::set_lives(size_t){}
+void Snake::set_lives(size_t n ){ this->m_lives = n; }
 void Snake::set_score(size_t){}
 void Snake::set_position(Level &lvl, char c, Position pos){ 
     if (pos.get_y() < lvl.get_maze().size() && pos.get_x() < lvl.get_maze()[pos.get_y()].size()) {

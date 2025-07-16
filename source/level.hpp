@@ -12,7 +12,7 @@ class Level{
     size_t m_length;
     std::vector<std::string> m_level_maze;
     
-    size_t food_amount = 1;
+    size_t food_amount = 10;
     Position m_spawnpoint;
     Position m_food_coords;
 
@@ -29,6 +29,7 @@ class Level{
     void print_level(Level);
     void place_food_in_maze(Position&);
     void generate_food();
+    bool there_is_food_at_maze();
 
     //Setters
     void set_width(size_t);
@@ -39,7 +40,7 @@ class Level{
     void set_position(Position, char);
 
     //Getters
-    size_t get_food_amount();
+    size_t& get_food_amount();
     char get_item_pos(std::vector<std::string>, size_t, size_t);
     std::vector<std::string>& get_maze();
     Position get_spawnpoint();

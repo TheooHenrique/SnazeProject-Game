@@ -4,6 +4,7 @@
 
 #include "level.hpp"
 #include "player.hpp"
+#include "positiondirection.hpp"
 #include "reader.hpp"
 #include <cstddef>
 #include <cstdint>
@@ -31,14 +32,21 @@ class SnazeSimulation{
         LOST,
         END
     };
+    Snake &sn = Snake::get_instance();
     size_t m_current_state;
-    size_t m_fps;
+    size_t m_fps{100};
     Level m_current_lvl;
     Player* my_player;
     std::deque<Level> m_levels;
     Reader read;
     char m_head;
     bool dead;
+    size_t aux_food;
+    size_t aux_fps;
+    size_t aux_lives;
+    bool no_path;
+    Position current_pos_for_search;
+    
 
 
     public:
@@ -63,7 +71,6 @@ class SnazeSimulation{
     std::deque<Level> get_levels();
 
     //Singleton Pattern Implementation
-    Snake &sn = Snake::get_instance();
     static SnazeSimulation& get_instance(){
         static SnazeSimulation sg;
         return sg;

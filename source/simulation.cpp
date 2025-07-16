@@ -22,10 +22,10 @@ void SnazeSimulation::usage(){
     std::cout << "Usage: snaze [<options>] <input_level_file>\n";
     std::cout << "Game simulation options:\n";
     std::cout << "--help Print this help text.\n";
-    std::cout << "--fps <num> Number of frames (board) presented per second.\n";
+    std::cout << "--fps <num> Number of frames (board) presented per second. Default = 10\n";
     std::cout << "--lives <num> Number of lives the snake shall have. Default = 5.\n";
     std::cout << "--food <num> Number of food pellets for the entire simulation. Default = 10.\n";
-    std::cout << "--playertype <type> Type of snake intelligence: random, backtracking. Default = backtracking\n";
+    std::cout << "--playertype <type> Type of snake intelligence: random, backtracking. Default = Random (This Project do not implemented the Backtrack player)\n";
 }
 
 void SnazeSimulation::initialize(int argc, char* argv[]){
@@ -36,19 +36,21 @@ void SnazeSimulation::initialize(int argc, char* argv[]){
         //Capturing the level file.
         std::string extension = std::filesystem::path(argv[ct]).extension().string();
         if (extension == ".dat"){
-            if (count == 0){
+            ++count;
+            if (count == 1){
                 std::ifstream config_file;
                 config_file.open(std::filesystem::path(argv[ct]));
                 if (!config_file.is_open()) {std::cerr << "Error: Cannot open the config file!: " << argv[ct] << std::endl;} //Possib error
                 this->m_levels = read.parse_cfg(config_file);
                 config_file.close();
-                count++;
 
                 //Setting configuration based on current_level:
                 
                 if (this->m_levels.size() > 0){ this->m_current_lvl = m_levels[0]; }
-                else{std::cerr << "Error! Your inputed level file has no valid level!\n"; break;}
-            } else{ std::cerr << "Error! You inputed two or more .dat files!\n"; break;}
+                else{throw std::runtime_error ("Error! Your inputed level file has no valid level!");}
+            }
+            else{ throw std::runtime_error ("Error! You inputed two or more .dat files!"); }
+            
         }
         
         //Capturing the configurations
@@ -59,27 +61,43 @@ void SnazeSimulation::initialize(int argc, char* argv[]){
             Dictios::interface selected_option {it->second};
             if (selected_option == dicts.HELP){usage(); exit(0);}
             if (ct + 1 < argc){
-                if (selected_option == dicts.FPS){try{set_fps(std::stoi(argv[ct + 1]));} catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at fps option!\n"; }}
-                if (selected_option == dicts.FOOD){try{m_current_lvl.set_food_amount(std::stoi(argv[ct + 1]));} catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at food option!\n";}}
-                if (selected_option == dicts.LIVES){try{aux = std::stoi(argv[ct + 1]);} catch(const std::runtime_error& e){std::cerr << "Error: You inserted a invalid type at lives option!\n";}}
-                if (selected_option == dicts.PLAYERTYPE){try{
-                        if (strcmp(argv[ct+1], "backtracking") == 0){
-                            if (aux != -1){ this->get_snake().set_lives(aux);} //Tem que alterar isso aqui. Tem que setar o player como backtrack player
-                            my_player = new Player();
-                        }
-                        else if(strcmp(argv[ct+1], "random") == 0){
-                            if (aux != -1){ this->get_snake().set_lives(aux) ;} //Tem que alterar isso aqui. Tem que setar o player como random player
-                            my_player = new Player();
-                        } else{
-                            std::cout << "WARNING: You inserted a invalid type at player type option! Starting with backtracking player by default.\n";
-                            if (aux != -1){ this->get_snake().set_lives(aux);}
-                            my_player = new Player();
-                        }
-                } catch(const std::runtime_error& e){ std::cerr << "Error: You inserted a invalid type at player type option!\n";}}
+                if (selected_option == dicts.FPS){try{ if (std::stoi(argv[ct + 1]) != 0){set_fps(std::stoi(argv[ct + 1]));};} catch(const std::invalid_argument){
+                    std::cout << "=============================================================\n";
+                    std::cout << "WARNING: You inserted a invalid type at fps option!\n"; 
+                    std::cout << "Please insert a number!\n";
+                    std::cout << "Starting with default value (10)\n"; 
+                    std::cout << "=============================================================\n\n";
+                }}
+                if (selected_option == dicts.FOOD){try{aux_food = std::stoi(argv[ct + 1]);} catch(const std::invalid_argument){
+                    std::cout << "=============================================================\n";
+                    std::cout << "WARNING: You inserted a invalid type at food option!\n";
+                    std::cout << "Please insert a number!\n";
+                    std::cout << "Starting with default value (10)\n";
+                    std::cout << "=============================================================\n\n";
+                }}
+                if (selected_option == dicts.LIVES){try{ if (std::stoi(argv[ct + 1]) != 0) {sn.set_lives(std::stoi(argv[ct + 1]));} ;} catch(const std::invalid_argument){
+                    std::cout << "=============================================================\n";
+                    std::cout << "WARNING: You inserted a invalid type at lives option!\n";
+                    std::cout << "Please insert a number!\n";
+                    std::cout << "Starting with default value (5)\n";
+                    std::cout << "=============================================================\n\n";
+                }}
+                    
+                if (selected_option == dicts.PLAYERTYPE){
+                    if (strcmp(argv[ct+1], "backtracking") == 0){ std::cout << "- WARNING: I am so sorry but this program do not implemented the backtracking player! :(\n- Starting with Random by default\n\n"; }
+                    else if(strcmp(argv[ct+1], "random") == 0){ std::cout << "\nStarting with random Player!\n";}
+                    else{ std::cout << "WARNING: You inserted a invalid type at player type option! But this project has not implemented the backtracking player :( \nStarting with random player by default.\n\n"; }
+                }
             }
-            else {std::cerr << "Error: You don't inserted some of the config parameters!\n";}
+            else {
+                std::cout << "=============================================================\n";
+                std::cout << "WARNING: You don't inserted some of the config parameters!\n";
+                std::cout << "Starting with default! \n";
+                std::cout << "=============================================================\n\n";
+            }
         }
     }
+    if (count == 0){ throw std::runtime_error ("Error! Please input at least one .dat file!");}
 }
 
 void SnazeSimulation::startdirection(){ 
@@ -95,10 +113,15 @@ void SnazeSimulation::startdirection(){
 
 void SnazeSimulation::process_events(){
     if (m_current_state == READING_INPUT){
+        //Reset the dead state of the snake
         dead = false;
+
+        //Treating the initializer config for each level
         m_current_lvl = m_levels[0];
+        if (aux_food != 0){m_current_lvl.set_food_amount(aux_food);}
         sn.set_eated(0);
         sn.set_size(1);
+
         //Defining first direction of snake head
         startdirection();
 
@@ -119,15 +142,24 @@ void SnazeSimulation::process_events(){
         }
         m_levels.pop_front();
     }
-    else if (m_current_state == WAITING_START){  }
+    else if (m_current_state == WAITING_START){
+        dead = false;
+        m_current_lvl.set_position(sn.get_current_pos(), ' ');
+        sn.set_current_pos(m_current_lvl.get_spawnpoint());
+        
+    }
     //==================================================================================================================================
     else if (m_current_state == RANDOM_SEARCH){
         if (dead) { return; }
-        m_current_lvl.generate_food();
-        m_current_lvl.place_food_in_maze(m_current_lvl.get_food_cords());
+        no_path = false;
+
+        if (!m_current_lvl.there_is_food_at_maze()){
+            m_current_lvl.generate_food();
+            m_current_lvl.place_food_in_maze(m_current_lvl.get_food_cords());
+        }
 
         //Cobra "VIRTUAL" para simular que ta andando
-        Position current_pos_for_search = sn.get_current_pos();
+        current_pos_for_search = sn.get_current_pos();
         Direction current_dir_for_search = sn.get_dir();
         std::deque<Position> simulated_body = sn.get_body();
         size_t simulated_snake_size = sn.get_size();
@@ -140,14 +172,10 @@ void SnazeSimulation::process_events(){
         std::mt19937 g(rd());
         std::vector<Direction> possib_dir;
 
-        size_t max_search_iterations = 100000; 
-        size_t current_iteration = 0;
+        while(current_pos_for_search != m_current_lvl.get_food_cords()){
 
-        while(current_pos_for_search != m_current_lvl.get_food_cords() && current_iteration < max_search_iterations){
-            ++current_iteration;
             Position next_step_pos = current_pos_for_search;
 
-            //ALTERAÇÃO RADICAL NA MUDANÇA DE MOVIMENTO DA COBRA BURRA:
             //-------------------------------------------------------- CASO A COBRA ESTEJA VIRADA PARA CIMA -------------------------------------------------------- 
             if (current_dir_for_search == Direction::UP){
                 
@@ -162,37 +190,58 @@ void SnazeSimulation::process_events(){
                 }
 
                 //VERIFICA SE A COBRA NÃO ESTÁ SEM SAÍDA
-                if (possib_dir.empty()){break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
+                if (possib_dir.empty()){ no_path = true; break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
                 //RANDOMIZA A ESCOLHA DA COBRA BURRA
                 std::shuffle(possib_dir.begin(), possib_dir.end(), g);
 
                 //CASO ELA ESCOLHA SE MANTER INDO UP, ANDE
                 if (possib_dir[0] == Direction::UP){
                     next_step_pos.set_y(next_step_pos.get_y() - 1); //MOVE THE SNAKE WHILE THINKING
-                    if (simulated_snake_size > 1) { //REFRESH THE SNAKE BODY: TALVEZ TENHA QUE ALTERAR PQ GET_BODY RETORNA O CORPO REAL DA COBRA <----------------------
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
+                    if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::UP);//FEED THE SOLUTION DEQUE
                 }
                 //CASO ELA ESCOLHA IR PARA A ESQUERDA, VIRE PARA A ESQUERDA E ANDE
                 else if (possib_dir[0] == Direction::LEFT){
                     current_dir_for_search = Direction::LEFT;
                     next_step_pos.set_x(next_step_pos.get_x() - 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::LEFT);
                 }
                 //CASO ELA ESCOLHA IR PARA A ESQUERDA, VIRE PARA A DIREITA E ANDE
                 else if (possib_dir[0] == Direction::RIGHT){
                     current_dir_for_search = Direction::RIGHT;
                     next_step_pos.set_x(next_step_pos.get_x() + 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::RIGHT);
                 }
             }
@@ -210,7 +259,7 @@ void SnazeSimulation::process_events(){
                 }
 
                 //VERIFICA SE A COBRA NÃO ESTÁ SEM SAÍDA
-                if (possib_dir.empty()){break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
+                if (possib_dir.empty()){no_path = true; break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
 
                 //RANDOMIZA A ESCOLHA DA COBRA BURRA
                 std::shuffle(possib_dir.begin(), possib_dir.end(), g);
@@ -218,30 +267,51 @@ void SnazeSimulation::process_events(){
                 //CASO ELA ESCOLHA SE MANTER INDO DOWN, ANDE
                 if (possib_dir[0] == Direction::DOWN){
                     next_step_pos.set_y(next_step_pos.get_y() + 1); //MOVE THE SNAKE WHILE THINKING
-                    if (simulated_snake_size > 1) { //REFRESH THE SNAKE BODY: TALVEZ TENHA QUE ALTERAR PQ GET_BODY RETORNA O CORPO REAL DA COBRA <----------------------
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
+                    if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::DOWN);//FEED THE SOLUTION DEQUE
                 }
                 //CASO ELA ESCOLHA IR PARA A ESQUERDA, VIRE PARA A ESQUERDA E ANDE
                 else if (possib_dir[0] == Direction::LEFT){
                     current_dir_for_search = Direction::LEFT;
                     next_step_pos.set_x(next_step_pos.get_x() - 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::LEFT);
                 }
                 //CASO ELA ESCOLHA IR PARA A ESQUERDA, VIRE PARA A DIREITA E ANDE
                 else if (possib_dir[0] == Direction::RIGHT){
                     current_dir_for_search = Direction::RIGHT;
                     next_step_pos.set_x(next_step_pos.get_x() + 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::RIGHT);
                 }
             }
@@ -259,7 +329,7 @@ void SnazeSimulation::process_events(){
                 }
 
                 //VERIFICA SE A COBRA NÃO ESTÁ SEM SAÍDA
-                if (possib_dir.empty()){break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
+                if (possib_dir.empty()){no_path = true; break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
 
                 //RANDOMIZA A ESCOLHA DA COBRA BURRA
                 std::shuffle(possib_dir.begin(), possib_dir.end(), g);
@@ -267,30 +337,51 @@ void SnazeSimulation::process_events(){
                 //CASO ELA ESCOLHA SE MANTER INDO LEFT, ANDE
                 if (possib_dir[0] == Direction::LEFT){
                     next_step_pos.set_x(next_step_pos.get_x() - 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::LEFT);
                 }
                 //CASO ELA ESCOLHA IR PARA CIMA, VIRE PARA CIMA E ANDE
                 else if (possib_dir[0] == Direction::UP){
                     current_dir_for_search = Direction::UP;
                     next_step_pos.set_y(next_step_pos.get_y() - 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::UP);
                 }
                 //CASO ELA ESCOLHA IR PARA BAIXO, VIRE PARA BAIXO E ANDE
                 else if (possib_dir[0] == Direction::DOWN){
                     current_dir_for_search = Direction::DOWN;
                     next_step_pos.set_y(next_step_pos.get_y() + 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::DOWN);
                 }
             }
@@ -308,7 +399,7 @@ void SnazeSimulation::process_events(){
                 }
 
                 //VERIFICA SE A COBRA NÃO ESTÁ SEM SAÍDA
-                if (possib_dir.empty()){break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
+                if (possib_dir.empty()){no_path = true; break;} //<----------------------------------------- ADICIONEI A VERIFICACAO DE MORTE
 
                 //RANDOMIZA A ESCOLHA DA COBRA BURRA
                 std::shuffle(possib_dir.begin(), possib_dir.end(), g);
@@ -316,36 +407,56 @@ void SnazeSimulation::process_events(){
                 //CASO ELA ESCOLHA SE MANTER INDO RIGHT, ANDE
                 if (possib_dir[0] == Direction::RIGHT){
                     next_step_pos.set_x(next_step_pos.get_x() + 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::RIGHT);
                 }
                 //CASO ELA ESCOLHA IR PARA CIMA, VIRE PARA CIMA E ANDE
                 else if (possib_dir[0] == Direction::UP){
                     current_dir_for_search = Direction::UP;
                     next_step_pos.set_y(next_step_pos.get_y() - 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::UP);
                 }
                 //CASO ELA ESCOLHA IR PARA BAIXO, VIRE PARA BAIXO E ANDE
                 else if (possib_dir[0] == Direction::DOWN){
                     current_dir_for_search = Direction::DOWN;
                     next_step_pos.set_y(next_step_pos.get_y() + 1);
+                    bool simulated_ate_food = (next_step_pos == m_current_lvl.get_food_cords());
+                    if (simulated_ate_food) {
+                        simulated_snake_size++; // CRESCE
+                    }
                     if (simulated_snake_size > 1) {
                         simulated_body.push_front(current_pos_for_search);
-                        if (simulated_body.size() > simulated_snake_size) {
-                            simulated_body.pop_back(); } }
+                        // se NÃO comeu, remove
+                        if (!simulated_ate_food && simulated_body.size() >= simulated_snake_size) {
+                            simulated_body.pop_back();
+                        }
+                    }
                     my_player->get_nextdirection().push_back(Direction::DOWN);
                 }
             }
             //Refresh the current position of the snake
             current_pos_for_search = next_step_pos;
-
         }
 
     }//==================================================================================================================================
@@ -357,7 +468,13 @@ void SnazeSimulation::process_events(){
                 if (my_player->check_if_snake_is_prision(m_current_lvl, sn.get_current_pos(), sn.get_dir(), sn.get_body())) {
                     sn.set_position(m_current_lvl, 'X', sn.get_current_pos());
                     dead = true;
-                    std::cout << "\nBATEU! A cobra não tem para onde ir!\n";
+                    sn.set_lives(sn.get_lives() - 1);
+
+                    std::cout << "=============================================================\n";
+                    std::cout << "CRASHED!\n";
+                    std::cout << "But you still have "<< sn.get_lives() << " lives!\n";
+                    std::cout << "You can Restart the game!\n";
+                    std::cout << "=============================================================\n\n";
                 }
             }
 
@@ -433,8 +550,8 @@ void SnazeSimulation::process_events(){
                 for (const auto& seg : body) {
                     sn.set_position(m_current_lvl, 'o', seg);
                 }
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                //Delay
+                std::this_thread::sleep_for(std::chrono::milliseconds(m_fps));
             }
 
     }//==================================================================================================================================
@@ -444,23 +561,22 @@ void SnazeSimulation::update(){
     if (m_current_state == START){ m_current_state = READING_INPUT; }
     else if (m_current_state == READING_INPUT){ m_current_state = WAITING_START; }
     else if (m_current_state == WAITING_START){if (std::cin.get() == '\n') {m_current_state = RANDOM_SEARCH;}}//TEMPORÁRIO! Depois tem que fazer o backtracking!
-    else if (m_current_state == RANDOM_SEARCH){
-        if (dead){ m_current_state = DEAD; }
-        else {m_current_state = WALKING; }
-    }
+    else if (m_current_state == RANDOM_SEARCH){ m_current_state = WALKING; }
     else if (m_current_state == WALKING){
         if (dead){
-            m_current_state = DEAD;
+            if (sn.get_lives() == 0){m_current_state = DEAD;}
+            else{ m_current_state = WAITING_START; }
         }
-        else if (my_player->get_nextdirection().empty()) { m_current_state = FOUND; }
+        else if (my_player->get_nextdirection().empty() && !dead) { m_current_state = FOUND; }
 
         }
     else if (m_current_state == FOUND){
-        if (sn.get_eated() == m_current_lvl.get_food_amount()){
-            if (m_levels.empty()){ m_current_state = WON_GAME; }
+        if (sn.get_eated() == m_current_lvl.get_food_amount()){ //Caso passe de nivel
+            if (m_levels.empty()){ m_current_state = WON_GAME; } //Caso não tenha mais níveis, venceu
             else{ m_current_state = READING_INPUT; } // Prepara próximo nível
         }
-        else { m_current_state = RANDOM_SEARCH; } // Procura próxima comida
+        else if (dead) { m_current_state = WAITING_START; } // Caso esteja morto e ainda tenha vidas, espere o comando do jogador
+        else{ m_current_state = RANDOM_SEARCH; }//Procura a proxima comida
     }
     else if (m_current_state == WON_GAME){ m_current_state = END; }
     else if (m_current_state == DEAD) { m_current_state = END; } //PROVISOTIO
@@ -474,22 +590,32 @@ void SnazeSimulation::render(){
     }
     else if (m_current_state == RANDOM_SEARCH){ std::cout << "\nThinking...\n"; }
     else if (m_current_state == WALKING){
-        std::cout << "Eaten Food: " << sn.get_eated() << ", Current Size: " << sn.get_size() << std::endl;
+        std::cout << "---> Foods to Eat: " << m_current_lvl.get_food_amount() << std::endl;
+        std::cout << "> Eaten Food: " << sn.get_eated() << "\n> Current Size: " << sn.get_size() << "\n> Lives: " << sn.get_lives() <<std::endl; 
         m_current_lvl.print_level(m_current_lvl);
     }
-    else if (m_current_state == WON_GAME){ std::cout << "\n==============================================\nCONGRATS!!!!!!!!!!!!!!!!!!!!\nYOU WON!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n==============================================\n";}
+    else if (m_current_state == FOUND){
+        std::cout << "---> Foods to Eat: " << m_current_lvl.get_food_amount() << std::endl;
+        std::cout << "> Eaten Food: " << sn.get_eated() << "\n> Current Size: " << sn.get_size() << "\n> Lives: " << sn.get_lives() <<std::endl; 
+        m_current_lvl.print_level(m_current_lvl);
+    }
+    else if (m_current_state == WON_GAME){
+        std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n";
+        std::cout << "          Congratulations!        \n";
+        std::cout << "              You Won!            \n";
+        std::cout << "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n";
+    }
     else if (m_current_state == DEAD){
         m_current_lvl.print_level(m_current_lvl);
-        std::cout << "\n================================\n";
-        std::cout << "BATEU! A cobra não tem saída!\n";
-        std::cout << "================================\n";
+        std::cout << "Eaten Food: " << sn.get_eated() << ", Current Size: " << sn.get_size() << ", Lives: " << sn.get_lives() <<std::endl;
+        std::cout << "\n=================================\n";
+        std::cout << "You lost all your lives! You LOSE!\n";
+        std::cout << "==================================\n";
     }
 }
 
-//Alterar essa coisa horrorosa aqui em cima depois.
-
 //==================Setters===================
-void SnazeSimulation::set_fps(size_t value){ this->m_fps = value; }
+void SnazeSimulation::set_fps(size_t value){ this->m_fps = 1000/value; }
 void SnazeSimulation::set_levels(std::deque<Level> lvl){ this->m_levels = lvl;}
 
 //==================Getters===================
