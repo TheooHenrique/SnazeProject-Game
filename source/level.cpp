@@ -3,7 +3,17 @@
 #include <random>
 #include <ctime>
 
-//Methods
+/**
+ * @file level.cpp
+ * @brief Implements the methods of the Level class.
+ */
+
+/**
+ * @brief Finds a valid random position for the food and updates the food coordinates.
+ *
+ * This method scans the entire maze for empty spaces (' '). It collects all valid
+ * positions and then randomly selects one to be the new location for the food pellet.
+ */
 void Level::generate_food(){
     // Initializes the time-based random number generator
     static std::mt19937 rng(static_cast<unsigned int>(std::time(nullptr)));
@@ -35,6 +45,10 @@ void Level::generate_food(){
     m_food_coords = valid_positions[dist(rng)];
 }
 
+/**
+ * @brief Places the food character 'f' into the maze data at a given position.
+ * @param m_food_cords_for_this_function The coordinates where the food should be placed.
+ */
 void Level::place_food_in_maze(Position& m_food_cords_for_this_function) {
     size_t x = m_food_cords_for_this_function.get_x();
     size_t y = m_food_cords_for_this_function.get_y();
@@ -44,9 +58,16 @@ void Level::place_food_in_maze(Position& m_food_cords_for_this_function) {
     }
 }
 
-//renderiza imprimindo todo o labirinto. se funcionar, 'f' estará no local indicado
+/**
+ * @brief (Legacy) Renders the maze by printing its raw string data to the console.
+ * @param lvl The Level object to be printed.
+ */
 void Level::print_level(Level lvl){ for (int j{0}; j < lvl.get_maze().size(); ++j){ std::cout << lvl.get_maze()[j] << std::endl; } }
 
+/**
+ * @brief Checks if a food item ('f') exists in the maze.
+ * @return True if at least one 'f' character is found, false otherwise.
+ */
 bool Level::there_is_food_at_maze(){
     for (size_t y{0}; y < m_level_maze.size(); ++y){
         for (size_t x{0}; x < m_level_maze[y].length(); ++x){
@@ -57,7 +78,6 @@ bool Level::there_is_food_at_maze(){
 }
 
 
-//Setters
 void Level::set_width(size_t width){ this->m_width = width; }
 void Level::set_length(size_t len){ this->m_length = len; }
 void Level::set_food_amount(size_t amount){ this->food_amount = amount; }
@@ -69,7 +89,6 @@ void Level::set_position(Position pos, char c) {
 }
 
 
-//Getters
 size_t& Level::get_food_amount(){ return this->food_amount; }
 std::vector<std::string>& Level::get_maze(){ return this->m_level_maze; }
 Position Level::get_spawnpoint(){ return m_spawnpoint; }
